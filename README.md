@@ -10,7 +10,7 @@
 
 - ⛓️ **[SatoshiTrace](https://satoshitrace.vercel.app/)**: Bitcoin privacy intelligence tool that shows what the chain thinks is anonymous
 - 🕵️ **[Coin UTXO](https://coinutxo.vercel.app/)**: crypto fraud attribution workspace. Multi-hop tracing from scam wallet to exchange, with case reports
-- 🌐 **[Portfolio](https://portfolio-websitee-liard.vercel.app/index.html)**: all my projects in one place
+- 🌐 **[Portfolio] (https://my-portfolio-web-pi-peach.vercel.app/) all my projects in one place
 
 ### 🎒 Inventory
 
