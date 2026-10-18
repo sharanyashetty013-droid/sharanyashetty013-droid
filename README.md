@@ -14,10 +14,10 @@
 
 ### 🎒 Inventory
 
-- 🌱 **Currently learning:** Go · Solidity · System Design · DSA (C++)
-- 💬 **Ask me about:** Blockchain forensics, Go APIs, DSA, public speaking 🎤
-- 📫 **Reach me:** sharanyashetty013@gmail.com
-- ⚡ **Fun fact:** I trace stolen crypto for fun and call it a hobby
+-  **Currently learning:** Go · Solidity · System Design · DSA (C++)
+-  **Ask me about:** Blockchain forensics, Go APIs, DSA, public speaking 🎤
+-  **Reach me:** sharanyashetty013@gmail.com
+-  **Fun fact:** I trace stolen crypto for fun and call it a hobby
 
 ### 🔗 Connect with me
 
