@@ -2,7 +2,7 @@
   <img src="./terminal-banner.svg" width="100%" alt="Sharanya Shetty - animated Minecraft banner"/>
 </p>
 
-<h3 align="center">⛏️ 2nd-year CSE @ NMAMIT · Backend · Blockchain forensics · DSA</h3>
+<h3 align="center">⛏️ 2nd-year CSE @ NMAMIT · Backend · Blockchain ·Crypto · DSA</h3>
 
 ---
 
