@@ -131,6 +131,25 @@ func contributions(user string) (total, streak, longest int, err error) {
 	}
 	// with "include private contributions" on, the calendar total already counts them; don't add Restricted again
 	log.Printf("calendar total %d (restricted, already included: %d)", out.Data.User.CC.Cal.Total, out.Data.User.CC.Restricted)
+	// also log this calendar year's numbers, to compare with "N contributions in YYYY" on the profile
+	var y struct {
+		Data struct {
+			User struct {
+				CC struct {
+					Restricted int `json:"restrictedContributionsCount"`
+					Cal        struct {
+						Total int `json:"totalContributions"`
+					} `json:"contributionCalendar"`
+				} `json:"contributionsCollection"`
+			} `json:"user"`
+		} `json:"data"`
+	}
+	from := time.Date(time.Now().UTC().Year(), 1, 1, 0, 0, 0, 0, time.UTC).Format(time.RFC3339)
+	qy := `query($u:String!,$f:DateTime!){user(login:$u){contributionsCollection(from:$f){restrictedContributionsCount contributionCalendar{totalContributions}}}}`
+	if err := postJSON("https://api.github.com/graphql", map[string]any{"query": qy, "variables": map[string]string{"u": user, "f": from}},
+		map[string]string{"Authorization": "Bearer " + tok}, &y); err == nil {
+		log.Printf("this year: calendar %d, restricted %d", y.Data.User.CC.Cal.Total, y.Data.User.CC.Restricted)
+	}
 	return out.Data.User.CC.Cal.Total, streak, longest, nil
 }
 
