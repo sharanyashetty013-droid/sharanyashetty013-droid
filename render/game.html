@@ -1,0 +1,284 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+@font-face{font-family:"Pixel";src:url("../assets/fonts/pixel.woff2") format("woff2")}
+@font-face{font-family:"Nunito";font-weight:700;src:url("../assets/fonts/nunito-700.woff2") format("woff2")}
+@font-face{font-family:"Nunito";font-weight:800;src:url("../assets/fonts/nunito-800.woff2") format("woff2")}
+html,body{margin:0;background:#fff}
+canvas{display:block}
+</style>
+</head>
+<body>
+<canvas id="c" width="880" height="440"></canvas>
+<script>
+// A tiny side-scrolling runner. draw(t) is pure: same t -> same frame,
+// so the renderer can step through time and the GIF loops seamlessly.
+const W = 880, H = 440, LOOP = 12;
+const V = 180;               // ground scroll speed (px/s); 2160px per loop = 45 tiles
+const GROUND = 318;          // feet line
+const CX = 300;              // character x
+const S = 0.21;              // character scale (source image is 426x1024)
+const ANCHOR = [210, 968];   // feet point in source pixels
+const JUMPS = [2.2, 6.2, 10.2], JD = 0.75, JH = 70;
+const DATA = window.DATA || {name: "SHARANYA L SHETTY", tagline: "backend · blockchain · problem solver", level: 3, lines: ["Hi! I'm Sharanya."]};
+
+const ctx = document.getElementById("c").getContext("2d");
+const img = n => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = "../assets/game/" + n + ".png"; });
+let HAIR, BODY, BLINK;
+window.ready = (async () => {
+  [HAIR, BODY, BLINK] = await Promise.all([img("hair"), img("body"), img("blink")]);
+  await document.fonts.load('20px "Pixel"'); await document.fonts.load('800 20px "Nunito"'); await document.fonts.load('700 20px "Nunito"');
+  return true;
+})();
+
+const mod = (a, n) => ((a % n) + n) % n;
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const ease = u => 1 - Math.pow(1 - u, 3);
+// nearest copy of a looping event time to t
+const near = (e, t) => [e - LOOP, e, e + LOOP].reduce((best, x) => Math.abs(x - t) < Math.abs(best - t) ? x : best);
+
+function jumpH(t) {
+  for (const j of JUMPS) { const s = near(j, t), u = (t - s) / JD; if (u >= 0 && u <= 1) return 4 * JH * u * (1 - u); }
+  return 0;
+}
+function squash(t) {
+  for (const j of JUMPS) {
+    const s = near(j, t);
+    if (t > s - 0.08 && t < s) return [1.07, 0.92];
+    if (t > s + JD && t < s + JD + 0.09) return [1.08, 0.9];
+  }
+  return [1, 1];
+}
+
+// ---------- background ----------
+function sky() {
+  const g = ctx.createLinearGradient(0, 0, 0, GROUND);
+  g.addColorStop(0, "#b9ecfb"); g.addColorStop(1, "#f3fcff");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const s = ctx.createRadialGradient(760, 112, 10, 760, 112, 90);
+  s.addColorStop(0, "rgba(255,246,200,1)"); s.addColorStop(.35, "rgba(255,240,180,.9)"); s.addColorStop(1, "rgba(255,240,180,0)");
+  ctx.fillStyle = s; ctx.beginPath(); ctx.arc(760, 112, 90, 0, 7); ctx.fill();
+}
+function cloud(x, y, k) {
+  ctx.fillStyle = "rgba(255,255,255,.95)";
+  ctx.beginPath();
+  [[0, 0, 22], [24, -12, 26], [52, -2, 22], [30, 8, 20], [12, 10, 16]].forEach(([dx, dy, r]) => { ctx.moveTo(x + dx * k + r * k, y + dy * k); ctx.arc(x + dx * k, y + dy * k, r * k, 0, 7); });
+  ctx.fill();
+}
+function hills(t, period, speed, base, amp, color) {
+  const off = speed * t;
+  ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(0, GROUND);
+  for (let x = 0; x <= W; x += 6) {
+    const p = (x + off) / period * Math.PI * 2;
+    ctx.lineTo(x, base - amp * (0.6 * Math.sin(p) + 0.4 * Math.sin(2 * p + 1)));
+  }
+  ctx.lineTo(W, GROUND); ctx.fill();
+}
+function block(x, y, s, q) {
+  ctx.fillStyle = q ? "#FDDD00" : "#00ADD8"; ctx.fillRect(x, y, s, s);
+  ctx.fillStyle = q ? "#ffef80" : "#5fd3ee"; ctx.fillRect(x, y, s, 4); ctx.fillRect(x, y, 4, s);
+  ctx.fillStyle = q ? "#c9a400" : "#0089ad"; ctx.fillRect(x, y + s - 4, s, 4); ctx.fillRect(x + s - 4, y, 4, s);
+  if (q) { ctx.fillStyle = "#8a6d00"; ctx.font = '16px "Pixel"'; ctx.textAlign = "center"; ctx.fillText("?", x + s / 2 + 1, y + s / 2 + 8); ctx.textAlign = "left"; }
+}
+function ground(t) {
+  ctx.fillStyle = "#7fe0b8"; ctx.fillRect(0, GROUND, W, 12);
+  ctx.fillStyle = "#5cc99c"; ctx.fillRect(0, GROUND + 10, W, 3);
+  const off = mod(V * t, 48);
+  for (let x = -off; x < W; x += 48) for (let y = GROUND + 13; y < H; y += 48) {
+    const dark = (Math.round((x + off) / 48) + Math.round(y / 48)) % 2;
+    ctx.fillStyle = dark ? "#00a3cc" : "#00ADD8"; ctx.fillRect(x, y, 48, 48);
+    ctx.fillStyle = "rgba(255,255,255,.18)"; ctx.fillRect(x, y, 48, 3);
+    ctx.fillStyle = "rgba(0,0,0,.08)"; ctx.fillRect(x + 45, y, 3, 48);
+  }
+  // grass tufts
+  ctx.fillStyle = "#4fbf8f";
+  for (let x = -mod(V * t, 72); x < W; x += 72) { ctx.fillRect(x + 10, GROUND - 4, 3, 4); ctx.fillRect(x + 15, GROUND - 6, 3, 6); ctx.fillRect(x + 20, GROUND - 3, 3, 3); }
+}
+function platforms(t) {
+  // floating ? platforms, world period 1080 (2 per loop: seamless)
+  for (let k = 0; k < 2; k++) {
+    const x = mod(980 + k * 540 - V * t, 1080) - 140;
+    block(x, 120, 32, false); block(x + 32, 120, 32, true); block(x + 64, 120, 32, false);
+  }
+}
+
+// ---------- character ----------
+function skirt(sway) {
+  const topY = 452, tl = 123, tr = 290, hl = 104, hr = 309, hy = 624, curve = 12, n = 10;
+  ctx.save(); ctx.translate(206, topY); ctx.transform(1, 0, sway, 1, 0, 0); ctx.translate(-206, -topY);
+  for (let i = 0; i < n; i++) {
+    const t0 = i / n, t1 = (i + 1) / n;
+    const g = ctx.createLinearGradient(0, topY, 0, hy);
+    if (i % 2) { g.addColorStop(0, "#0f3554"); g.addColorStop(1, "#0a2740"); } else { g.addColorStop(0, "#1b5b8c"); g.addColorStop(1, "#11446c"); }
+    ctx.fillStyle = g; ctx.beginPath();
+    ctx.moveTo(tl + t0 * (tr - tl), topY); ctx.lineTo(tl + t1 * (tr - tl), topY);
+    ctx.lineTo(hl + t1 * (hr - hl), hy + curve * Math.sin(Math.PI * t1)); ctx.lineTo(hl + t0 * (hr - hl), hy + curve * Math.sin(Math.PI * t0));
+    ctx.closePath(); ctx.fill();
+  }
+  const sh = ctx.createLinearGradient(0, topY, 0, hy); sh.addColorStop(0, "rgba(0,0,0,.45)"); sh.addColorStop(.25, "rgba(0,0,0,0)");
+  ctx.fillStyle = sh; ctx.beginPath(); ctx.moveTo(tl, topY); ctx.lineTo(tr, topY); ctx.lineTo(hr, hy); ctx.lineTo(hl, hy); ctx.fill();
+  ctx.strokeStyle = "#00ADD8"; ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.beginPath();
+  for (let i = 0; i <= 20; i++) { const u = i / 20; ctx.lineTo(hl + u * (hr - hl), hy + curve * Math.sin(Math.PI * u)); }
+  ctx.stroke(); ctx.restore();
+  // waistband + buckle
+  ctx.fillStyle = "#0a2238"; ctx.beginPath(); ctx.moveTo(tl - 1, topY - 11); ctx.quadraticCurveTo(206, topY - 15, tr + 1, topY - 11); ctx.lineTo(tr + 1, topY + 1); ctx.quadraticCurveTo(206, topY - 3, tl - 1, topY + 1); ctx.fill();
+  ctx.fillStyle = "#FDDD00"; ctx.fillRect(199, 439, 14, 11); ctx.fillStyle = "#0a2238"; ctx.fillRect(203, 442, 6, 5);
+}
+function character(t) {
+  const air = jumpH(t);
+  const run = Math.abs(Math.sin(Math.PI * 2 * t / 0.36)) * 5 * (air > 0 ? 0 : 1);
+  const [sx, sy] = squash(t);
+  const phase = Math.sin(Math.PI * 2 * t / 0.36);
+  // shadow
+  const k = 1 - 0.55 * air / JH;
+  ctx.fillStyle = `rgba(0,60,80,${0.22 * k})`; ctx.beginPath(); ctx.ellipse(CX, GROUND + 2, 34 * k, 6 * k, 0, 0, 7); ctx.fill();
+
+  ctx.save();
+  ctx.translate(CX, GROUND - air - run);
+  ctx.rotate(air > 0 ? 0.02 : 0.05);
+  ctx.scale(sx * S, sy * S);
+  ctx.translate(-ANCHOR[0], -ANCHOR[1]);
+  // hair streams back while running
+  ctx.save(); ctx.translate(206, 150); ctx.transform(1, 0, -0.06 + 0.035 * phase - (air > 0 ? 0.05 : 0), 1, 0, 0); ctx.translate(-206, -150);
+  ctx.drawImage(HAIR, 0, 0, 426, 1024); ctx.restore();
+  ctx.drawImage(BODY, 0, 0, 426, 1024);
+  skirt(-0.03 + 0.035 * Math.sin(Math.PI * 2 * t / 0.36 + 1) + (air > 0 ? 0.04 : 0));
+  const bt = mod(t, 3.1);
+  if ((bt > 1.9 && bt < 2.04) || (bt > 2.22 && bt < 2.34)) ctx.drawImage(BLINK, 0, 0, 426, 1024);
+  ctx.restore();
+}
+
+// ---------- enemies, coins, effects ----------
+function bug(x, y, t, squashed) {
+  ctx.save(); ctx.translate(x, y);
+  if (squashed > 0) { ctx.globalAlpha = 1 - squashed; ctx.scale(1 + 0.4 * squashed, 0.3); }
+  const step = Math.sin(t * 22);
+  ctx.strokeStyle = "#2b2d42"; ctx.lineWidth = 2.5;
+  for (let i = 0; i < 3; i++) { const lx = -12 + i * 12; ctx.beginPath(); ctx.moveTo(lx, -6); ctx.lineTo(lx + (i % 2 ? step : -step) * 4, 0); ctx.stroke(); }
+  ctx.fillStyle = "#ff4d6d"; ctx.beginPath(); ctx.ellipse(2, -16, 20, 14, 0, Math.PI, 0); ctx.lineTo(22, -6); ctx.lineTo(-18, -6); ctx.fill();
+  ctx.fillStyle = "#c9184a"; ctx.fillRect(1, -30, 2, 24);
+  ctx.fillStyle = "#2b2d42"; [[-8, -18], [10, -20], [8, -11], [-6, -10]].forEach(([a, b]) => { ctx.beginPath(); ctx.arc(a, b, 2.6, 0, 7); ctx.fill(); });
+  ctx.beginPath(); ctx.arc(-20, -12, 9, 0, 7); ctx.fill();
+  ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(-23, -14, 3, 0, 7); ctx.arc(-17, -14, 3, 0, 7); ctx.fill();
+  ctx.fillStyle = "#2b2d42"; ctx.beginPath(); ctx.arc(-24, -14, 1.4, 0, 7); ctx.arc(-18, -14, 1.4, 0, 7); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(-22, -20); ctx.lineTo(-27, -28); ctx.moveTo(-18, -20); ctx.lineTo(-15, -29); ctx.stroke();
+  ctx.restore();
+}
+function coin(x, y, t, s = 1) {
+  const w = Math.abs(Math.cos(t * 5)) * 11 * s + 2;
+  ctx.fillStyle = "#e0a800"; ctx.beginPath(); ctx.ellipse(x, y, w, 11 * s, 0, 0, 7); ctx.fill();
+  ctx.fillStyle = "#FDDD00"; ctx.beginPath(); ctx.ellipse(x, y, Math.max(1, w - 3), 8 * s, 0, 0, 7); ctx.fill();
+  if (w > 7) { ctx.fillStyle = "#b8860b"; ctx.font = `${Math.round(9 * s)}px "Pixel"`; ctx.textAlign = "center"; ctx.fillText("★", x, y + 4 * s); ctx.textAlign = "left"; }
+}
+function popup(text, x, y, u, color) {
+  ctx.save(); ctx.globalAlpha = clamp(1.4 - u * 1.4, 0, 1);
+  ctx.font = '12px "Pixel"'; ctx.textAlign = "center"; ctx.lineWidth = 5; ctx.strokeStyle = "#fff"; ctx.lineJoin = "round";
+  ctx.strokeText(text, x, y - u * 40); ctx.fillStyle = color; ctx.fillText(text, x, y - u * 40);
+  ctx.restore();
+}
+function stars(x, y, u) {
+  ctx.save(); ctx.globalAlpha = 1 - u; ctx.fillStyle = "#FDDD00";
+  for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2, r = 10 + u * 46; star(x + Math.cos(a) * r, y + Math.sin(a) * r * 0.7, 6 * (1 - u * 0.5)); }
+  ctx.restore();
+}
+function star(x, y, r) {
+  ctx.beginPath();
+  for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+  ctx.fill();
+}
+function heart(x, y) {
+  ctx.fillStyle = "#ff4d6d"; ctx.beginPath(); ctx.moveTo(x, y + 4);
+  ctx.bezierCurveTo(x, y, x - 7, y - 3, x - 7, y + 3); ctx.bezierCurveTo(x - 7, y + 8, x, y + 11, x, y + 14);
+  ctx.bezierCurveTo(x, y + 11, x + 7, y + 8, x + 7, y + 3); ctx.bezierCurveTo(x + 7, y - 3, x, y, x, y + 4); ctx.fill();
+}
+function panel(x, y, w, h) {
+  ctx.fillStyle = "rgba(255,255,255,.88)"; round(x, y, w, h, 10); ctx.fill();
+  ctx.strokeStyle = "#00ADD8"; ctx.lineWidth = 2; round(x, y, w, h, 10); ctx.stroke();
+}
+function round(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+
+const COIN_TIMES = JUMPS.flatMap(j => [0.28, 0.5, 0.72].map(f => j + JD * f));
+const LAND = JUMPS.map(j => j + JD);
+
+function draw(t) {
+  t = mod(t, LOOP);
+  sky();
+  for (let i = 0; i < 4; i++) cloud(mod(120 + i * 270 - 90 * t, 1080) - 100, 60 + (i % 2) * 40, i % 2 ? 0.8 : 1);
+  hills(t, 270, 45, 262, 26, "#d4f1fa");
+  hills(t, 540, 90, 290, 30, "#a6e0f0");
+  platforms(t);
+  ground(t);
+
+  // bugs: arrive under her exactly as she lands, then get squashed
+  LAND.forEach(l0 => {
+    const l = near(l0, t);
+    if (t < l && t > l - 4) bug(CX + (l - t) * (V + 30) + 6, GROUND, t, 0);
+    if (t >= l && t < l + 0.6) bug(CX + 6 - (t - l) * V, GROUND, t, (t - l) / 0.6);
+  });
+  // coins along the jump arc
+  let collected = 0;
+  COIN_TIMES.forEach((c0, i) => {
+    const c = near(c0, t), cy = GROUND - jumpH(c) - 120;
+    if (t < c && t > c - 5) coin(CX + (c - t) * V, cy, t);
+    if (t >= c && t < c + 0.45) { const u = ease((t - c) / 0.45); coin(CX + (812 - CX) * u, cy + (34 - cy) * u, t, 1 - 0.5 * u); }
+    if (t >= c && t < c + 0.8) popup("+50", CX + 26, cy - 10, (t - c) / 0.8, "#b8860b");
+    if (c0 + 0.45 <= t) collected++;
+  });
+
+  character(t);
+
+  LAND.forEach(l0 => {
+    const l = near(l0, t);
+    if (t >= l && t < l + 0.5) stars(CX + 6, GROUND - 12, (t - l) / 0.5);
+    if (t >= l && t < l + 1.1) popup("BUG FIXED! +100", CX + 10, GROUND - 228, (t - l) / 1.1, "#c9184a");
+  });
+
+  // ---- HUD ----
+  panel(14, 12, 196, 44);
+  for (let i = 0; i < 5; i++) heart(34 + i * 22, 22);
+  ctx.fillStyle = "#0b2533"; round(150, 21, 50, 26, 6); ctx.fill();
+  ctx.fillStyle = "#FDDD00"; ctx.font = '11px "Pixel"'; ctx.fillText("LV" + DATA.level, 157, 39);
+
+  ctx.textAlign = "center"; ctx.lineJoin = "round";
+  ctx.font = '22px "Pixel"'; ctx.lineWidth = 8; ctx.strokeStyle = "#fff"; ctx.strokeText(DATA.name.toUpperCase(), W / 2, 44);
+  ctx.fillStyle = "#0b2533"; ctx.fillText(DATA.name.toUpperCase(), W / 2, 44);
+  ctx.font = '800 15px "Nunito"'; ctx.lineWidth = 5; ctx.strokeText(DATA.tagline, W / 2, 68); ctx.fillStyle = "#0089ad"; ctx.fillText(DATA.tagline, W / 2, 68);
+  ctx.textAlign = "left";
+
+  panel(690, 12, 176, 44);
+  coin(714, 34, 1.2, 0.95);
+  ctx.fillStyle = "#0b2533"; ctx.font = '13px "Pixel"'; ctx.fillText("x" + String(collected).padStart(2, "0"), 732, 41);
+  // XP bar fills with every coin + bug, full right before LEVEL UP
+  const events = collected + LAND.filter(l => l + 0.2 <= t).length;
+  const fill = clamp(events / (COIN_TIMES.length + LAND.length), 0, 1);
+  ctx.fillStyle = "rgba(11,37,51,.12)"; round(790, 28, 64, 12, 6); ctx.fill();
+  if (fill > 0) { const g = ctx.createLinearGradient(790, 0, 854, 0); g.addColorStop(0, "#00ADD8"); g.addColorStop(1, "#5DE0B5"); ctx.fillStyle = g; round(790, 28, 64 * fill, 12, 6); ctx.fill(); }
+  ctx.fillStyle = "#55707d"; ctx.font = '7px "Pixel"'; ctx.fillText("XP", 790, 24);
+
+  if (t > 11.0) {
+    const u = (t - 11.0) / 1.0, pop = u < 0.15 ? 0.6 + u / 0.15 * 0.5 : 1.1 - Math.min(0.1, (u - 0.15));
+    ctx.save(); ctx.globalAlpha = u > 0.8 ? (1 - u) / 0.2 : 1; ctx.translate(W / 2 + 60, 190); ctx.scale(pop, pop);
+    ctx.fillStyle = "rgba(253,221,0,.25)";
+    for (let i = 0; i < 12; i++) { ctx.save(); ctx.rotate(i * Math.PI / 6 + t); ctx.fillRect(0, -6, 150, 12); ctx.restore(); }
+    ctx.font = '30px "Pixel"'; ctx.textAlign = "center"; ctx.lineWidth = 10; ctx.strokeStyle = "#0b2533"; ctx.strokeText("LEVEL UP!", 0, 12);
+    ctx.fillStyle = "#FDDD00"; ctx.fillText("LEVEL UP!", 0, 12);
+    ctx.restore();
+  }
+
+  // ---- dialogue ----
+  ctx.fillStyle = "rgba(255,255,255,.95)"; round(24, 352, 832, 76, 12); ctx.fill();
+  ctx.strokeStyle = "#0b2533"; ctx.lineWidth = 3; round(24, 352, 832, 76, 12); ctx.stroke();
+  ctx.fillStyle = "#00ADD8"; round(42, 338, 132, 28, 6); ctx.fill(); ctx.strokeStyle = "#0b2533"; ctx.lineWidth = 2; round(42, 338, 132, 28, 6); ctx.stroke();
+  ctx.fillStyle = "#fff"; ctx.font = '11px "Pixel"'; ctx.fillText("SHARANYA", 58, 357);
+  const lines = DATA.lines, slot = LOOP / lines.length, li = Math.floor(t / slot);
+  const shown = lines[li].slice(0, Math.floor((t - li * slot) / 0.035));
+  ctx.fillStyle = "#13232d"; ctx.font = '700 20px "Nunito"'; ctx.fillText(shown, 48, 400);
+  if (Math.floor(t * 2.5) % 2 === 0) { ctx.fillStyle = "#00ADD8"; ctx.beginPath(); ctx.moveTo(826, 404); ctx.lineTo(840, 404); ctx.lineTo(833, 413); ctx.fill(); }
+}
+window.draw = draw;
+window.LOOP = LOOP;
+</script>
+</body>
+</html>

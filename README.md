@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/banner.svg" width="100%" alt="Sharanya L Shetty — animated banner"/>
+  <img src="./assets/banner.gif" width="100%" alt="Sharanya L Shetty — runner game banner"/>
 </p>
 
 <p align="center">
@@ -20,6 +20,9 @@
 
 ## 🧱 Things I've built
 
+**🏠 [Walls Don't Lie](https://walls-dont-lie.vercel.app)** · [repo](https://github.com/sharanyashetty013-droid/Solidity-gang-)<br/>
+Proof on every wall, deposit back in your hands. Rental deposits held in a smart contract and settled by photo proof, not phone calls. Solidity · Ethereum Sepolia · React.
+
 **🧾 [Provenrely](https://github.com/neilmalvalli-cyber/Provenrely)**<br/>
 Tamper-proof, on-chain timestamped evidence certificates for flagged scam wallets, with an AI copilot that explains results in your language. Built in 24 hours at the MST Blockchain Buildathon.
 
@@ -32,21 +35,10 @@ All my projects in one place.
 - 🥉 **Nexus Srinathon 2026 (SIT)** · 3rd place out of 250+ teams
 - 🥈 **MLH Hacktoberfest** · runner-up, open source
 
-## 💬 Ask me about
-
-Blockchain forensics · Go APIs · DSA · public speaking 🎤<br/>
-<sub>fun fact: I trace stolen crypto for fun and call it a hobby</sub>
-
 ## 📊 Stats
 
 <p align="center">
-  <img src="https://streak-stats.demolab.com/?user=sharanyashetty013-droid&background=F3FBFE&ring=00ADD8&fire=00ADD8&currStreakNum=0B2533&sideNums=0B2533&currStreakLabel=0089AD&sideLabels=0089AD&dates=7D8A93&stroke=BFEAF6&border=BFEAF6&border_radius=12" />
-</p>
-<p align="center">
-  <img src="https://ghchart.rshah.org/00ADD8/sharanyashetty013-droid" width="90%" />
-</p>
-<p align="center">
-  <img src="https://leetcard.jacoblin.cool/sharanya_shetty01?theme=light&font=Fira%20Code&ext=heatmap" />
+  <img src="./assets/stats.svg" width="100%" alt="Player stats: contributions, streak, wins, LeetCode, projects"/>
 </p>
 
 ## 🔗 Find me
