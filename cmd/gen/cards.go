@@ -248,7 +248,7 @@ func writeCards(cfg Config, prs []PR) string {
 	for i, p := range prs {
 		name := fmt.Sprintf("pr-%d.svg", i)
 		writeFile("assets/cards/"+name, prSVG(p))
-		fmt.Fprintf(&md, "<a href=\"%s\"><img src=\"./assets/cards/%s\" width=\"100%%\" alt=\"%s\"/></a>\n", p.URL, name, esc(p.Repo+" · "+p.Title))
+		fmt.Fprintf(&md, "<a href=\"%s\"><img src=\"./assets/cards/%s\" width=\"720\" alt=\"%s\"/></a>\n", p.URL, name, esc(p.Repo+" · "+p.Title))
 	}
 	return md.String()
 }
