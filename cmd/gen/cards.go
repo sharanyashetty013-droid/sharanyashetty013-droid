@@ -24,11 +24,11 @@ type Win struct {
 }
 
 const (
-	cardBG     = "#1c2b4a"
-	cardBorder = "#5d6652"
-	ink        = "#fff3c4"
-	inkSoft    = "#b8c4d9"
-	accent     = "#ffe066"
+	cardBG     = "#e4ecf8"
+	cardBorder = "#7d8a9e"
+	ink        = "#14234a"
+	inkSoft    = "#4a5b7a"
+	accent     = "#b07d14"
 )
 
 func svgOpen(b *strings.Builder, w, h float64, label string) {
@@ -42,11 +42,11 @@ func svgOpen(b *strings.Builder, w, h float64, label string) {
 
 // pixel-style frame: soft drop, blue border, light fill, notched corners
 func frame(b *strings.Builder, x, y, w, h float64, fill string) {
-	fmt.Fprintf(b, `<rect x="%g" y="%g" width="%g" height="%g" fill="#0a1226"/>`, x+6, y+6, w-6, h-6)
+	fmt.Fprintf(b, `<rect x="%g" y="%g" width="%g" height="%g" fill="#c3cfe0"/>`, x+6, y+6, w-6, h-6)
 	fmt.Fprintf(b, `<rect x="%g" y="%g" width="%g" height="%g" fill="%s"/>`, x, y, w-6, h-6, cardBorder)
 	fmt.Fprintf(b, `<rect x="%g" y="%g" width="%g" height="%g" fill="%s"/>`, x+4, y+4, w-14, h-14, fill)
 	for _, c := range [][2]float64{{x, y}, {x + w - 10, y}, {x, y + h - 10}, {x + w - 10, y + h - 10}} {
-		fmt.Fprintf(b, `<rect x="%g" y="%g" width="4" height="4" fill="#0a1226"/>`, c[0], c[1])
+		fmt.Fprintf(b, `<rect x="%g" y="%g" width="4" height="4" fill="#c3cfe0"/>`, c[0], c[1])
 	}
 }
 
@@ -57,11 +57,11 @@ func sparkle(b *strings.Builder, x, y float64, c string) {
 func headerSVG(title string) string {
 	var b strings.Builder
 	svgOpen(&b, 1320, 64, title)
-	frame(&b, 0, 2, 1320, 60, "#1a2b4f")
-	b.WriteString(`<rect x="22" y="20" width="14" height="14" fill="#ffe066"/><rect x="26" y="24" width="6" height="6" fill="#5d6652"/>`)
+	frame(&b, 0, 2, 1320, 60, "#dde6f4")
+	b.WriteString(`<rect x="22" y="20" width="14" height="14" fill="#b07d14"/><rect x="26" y="24" width="6" height="6" fill="#7d8a9e"/>`)
 	fmt.Fprintf(&b, `<text x="50" y="38" class="px" style="font-size:20px">%s</text>`, esc(strings.ToUpper(title)))
-	sparkle(&b, 1250, 16, "#5d6652")
-	sparkle(&b, 1276, 32, "#c9b98a")
+	sparkle(&b, 1250, 16, "#7d8a9e")
+	sparkle(&b, 1276, 32, "#e8c25a")
 	b.WriteString(`</svg>`)
 	return b.String()
 }
@@ -69,11 +69,11 @@ func headerSVG(title string) string {
 func introSVG(line1, line2 string) string {
 	var b strings.Builder
 	svgOpen(&b, 1320, 100, line1)
-	frame(&b, 0, 0, 1320, 100, "#13213d")
+	frame(&b, 0, 0, 1320, 100, "#f6f8fc")
 	fmt.Fprintf(&b, `<text x="657" y="44" text-anchor="middle" style="font-weight:800;font-size:28px">%s</text>`, esc(line1))
-	fmt.Fprintf(&b, `<text x="657" y="76" text-anchor="middle" style="font-weight:700;font-size:21px;fill:#b8c4d9">%s</text>`, esc(line2))
-	sparkle(&b, 30, 24, "#5d6652")
-	sparkle(&b, 1270, 62, "#5d6652")
+	fmt.Fprintf(&b, `<text x="657" y="76" text-anchor="middle" style="font-weight:700;font-size:21px;fill:#4a5b7a">%s</text>`, esc(line2))
+	sparkle(&b, 30, 24, "#7d8a9e")
+	sparkle(&b, 1270, 62, "#7d8a9e")
 	b.WriteString(`</svg>`)
 	return b.String()
 }
@@ -105,11 +105,11 @@ func projectSVG(p Project) string {
 	}
 	var b strings.Builder
 	svgOpen(&b, W, H, p.Name)
-	frame(&b, 0, 0, W, H, "#13213d")
-	fmt.Fprintf(&b, `<rect x="4" y="4" width="%g" height="8" fill="#1c2b4a"/>`, W-14)
+	frame(&b, 0, 0, W, H, "#f6f8fc")
+	fmt.Fprintf(&b, `<rect x="4" y="4" width="%g" height="8" fill="#e4ecf8"/>`, W-14)
 	fmt.Fprintf(&b, `<text x="26" y="56" style="font-weight:800;font-size:32px">%s</text>`, esc(p.Name))
 	for i, l := range lines {
-		fmt.Fprintf(&b, `<text x="26" y="%g" style="font-weight:700;font-size:20px;fill:#b8c4d9">%s</text>`, 96+float64(i)*28, esc(l))
+		fmt.Fprintf(&b, `<text x="26" y="%g" style="font-weight:700;font-size:20px;fill:#4a5b7a">%s</text>`, 96+float64(i)*28, esc(l))
 	}
 	x := 26.0
 	for _, t := range p.Tags {
@@ -117,7 +117,7 @@ func projectSVG(p Project) string {
 		if x+w > W-30 {
 			break
 		}
-		fmt.Fprintf(&b, `<rect x="%g" y="236" width="%g" height="32" rx="16" fill="#1c2b4a"/><text x="%g" y="258" style="font-weight:800;font-size:16px;fill:#ffe066">%s</text>`, x, w, x+12, esc(t))
+		fmt.Fprintf(&b, `<rect x="%g" y="236" width="%g" height="32" rx="16" fill="#e4ecf8"/><text x="%g" y="258" style="font-weight:800;font-size:16px;fill:#b07d14">%s</text>`, x, w, x+12, esc(t))
 		x += w + 8
 	}
 	b.WriteString(`</svg>`)
@@ -136,11 +136,11 @@ func prSVG(p PR) string {
 	}
 	var b strings.Builder
 	svgOpen(&b, W, H, p.Repo)
-	frame(&b, 0, 0, W, H, "#13213d")
-	b.WriteString(`<rect x="24" y="24" width="28" height="28" rx="6" fill="#ffe066"/><path d="M31 32h6v12h-6zM43 32l6 6-6 6" fill="none" stroke="#13213d" stroke-width="3"/>`)
+	frame(&b, 0, 0, W, H, "#f6f8fc")
+	b.WriteString(`<rect x="24" y="24" width="28" height="28" rx="6" fill="#b07d14"/><path d="M31 32h6v12h-6zM43 32l6 6-6 6" fill="none" stroke="#f6f8fc" stroke-width="3"/>`)
 	fmt.Fprintf(&b, `<text x="64" y="47" style="font-weight:800;font-size:25px">%s</text>`, esc(repo))
 	for i, l := range lines {
-		fmt.Fprintf(&b, `<text x="26" y="%g" style="font-weight:700;font-size:20px;fill:#b8c4d9">%s</text>`, 92+float64(i)*28, esc(l))
+		fmt.Fprintf(&b, `<text x="26" y="%g" style="font-weight:700;font-size:20px;fill:#4a5b7a">%s</text>`, 92+float64(i)*28, esc(l))
 	}
 	b.WriteString(`</svg>`)
 	return b.String()
@@ -150,7 +150,7 @@ func winsSVG(wins []Win) string {
 	const W, H = 1320.0, 150.0
 	var b strings.Builder
 	svgOpen(&b, W, H, "Hackathon wins")
-	frame(&b, 0, 0, W, H, "#13213d")
+	frame(&b, 0, 0, W, H, "#f6f8fc")
 	medal := map[string][2]string{"gold": {"#f5c542", "#b8860b"}, "silver": {"#cfd8dc", "#8d9aa1"}, "bronze": {"#e0a370", "#9a5b2c"}}
 	colW := (W - 20) / float64(max(len(wins), 1))
 	for i, w := range wins {
@@ -163,9 +163,9 @@ func winsSVG(wins []Win) string {
 			ev = strings.Split(ev, " · ")[0]
 		}
 		fmt.Fprintf(&b, `<text x="%g" y="66" style="font-weight:800;font-size:25px">%s</text>`, x+92, esc(ev))
-		fmt.Fprintf(&b, `<text x="%g" y="96" style="font-weight:700;font-size:19px;fill:#b8c4d9">%s</text>`, x+92, esc(w.Note))
+		fmt.Fprintf(&b, `<text x="%g" y="96" style="font-weight:700;font-size:19px;fill:#4a5b7a">%s</text>`, x+92, esc(w.Note))
 		if i > 0 {
-			fmt.Fprintf(&b, `<rect x="%g" y="30" width="2" height="90" fill="#1c2b4a"/>`, x-4)
+			fmt.Fprintf(&b, `<rect x="%g" y="30" width="2" height="90" fill="#e4ecf8"/>`, x-4)
 		}
 	}
 	b.WriteString(`</svg>`)
@@ -214,7 +214,7 @@ func stackSVG(groups []StackGroup) string {
 	h := y + 6
 	var b strings.Builder
 	svgOpen(&b, W, h, "Tech stack")
-	frame(&b, 0, 0, W, h, "#13213d")
+	frame(&b, 0, 0, W, h, "#f6f8fc")
 	fmt.Fprintf(&b, `<rect x="4" y="4" width="866" height="10" fill="%s"/>`, cardBG)
 	for _, t := range titles {
 		fmt.Fprintf(&b, `<text x="%g" y="%g" class="px" style="font-size:14px;fill:%s">%s</text>`, padL, t.y, inkSoft, esc(strings.ToUpper(t.name)))
@@ -223,7 +223,7 @@ func stackSVG(groups []StackGroup) string {
 	b.WriteString(`<defs><linearGradient id="chipA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="` + chipTop + `"/><stop offset="1" stop-color="` + chipBottom + `"/></linearGradient></defs>`)
 	for _, c := range chips {
 		fmt.Fprintf(&b, `<rect x="%g" y="%g" width="%g" height="38" rx="19" fill="url(#chipA)" stroke="%s" stroke-width="1.5"/>`, c.x, c.y, c.w, chipRim)
-		fmt.Fprintf(&b, `<rect x="%g" y="%g" width="%g" height="15" rx="7.5" fill="#13213d" fill-opacity=".38"/>`, c.x+6, c.y+3, c.w-12)
+		fmt.Fprintf(&b, `<rect x="%g" y="%g" width="%g" height="15" rx="7.5" fill="#f6f8fc" fill-opacity=".38"/>`, c.x+6, c.y+3, c.w-12)
 		fmt.Fprintf(&b, `<text x="%g" y="%g" style="font-weight:800;font-size:19px;fill:%s">%s</text>`, c.x+16, c.y+26, chipText, esc(c.text))
 	}
 	b.WriteString(`</svg>`)

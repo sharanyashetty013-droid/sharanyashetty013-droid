@@ -28,7 +28,7 @@ let out = "", colY = [30, 30];
 groups.forEach(([title, items], gi) => {
   const c = gi < 3 ? 0 : 1, X0 = COLS[c];
   let y = colY[c];
-  out += `<text x="${X0}" y="${y + 16}" class="px" style="font-size:13px;fill:#c9b98a">${title.toUpperCase().replace("&", "&amp;")}</text>`;
+  out += `<text x="${X0}" y="${y + 16}" class="px" style="font-size:13px;fill:#9a6b0c">${title.toUpperCase().replace("&", "&amp;")}</text>`;
   y += 28;
   items.forEach((it, i) => {
     const col = i % PER, row = Math.floor(i / PER), x = X0 + col * STEP, ty = y + row * (TS + 34);
@@ -39,13 +39,13 @@ groups.forEach(([title, items], gi) => {
       else { const ic = it.kind === "l" ? icon(L, it.name) : icon(SI, it.name, it.color); const s = 34, sc = Math.min(s / ic.w, s / ic.h), iw = ic.w * sc, ih = ic.h * sc;
         out += `<svg x="${x + (TS - iw) / 2}" y="${ty + (TS - ih) / 2}" width="${iw}" height="${ih}" viewBox="0 0 ${ic.w} ${ic.h}">${ic.body}</svg>`; }
     }
-    out += `<text x="${x + TS / 2}" y="${ty + TS + 19}" text-anchor="middle" style="font-weight:800;font-size:13px;fill:#fff3c4">${it.label}</text>`;
+    out += `<text x="${x + TS / 2}" y="${ty + TS + 19}" text-anchor="middle" style="font-weight:800;font-size:13px;fill:#14234a">${it.label}</text>`;
   });
   colY[c] = y + Math.ceil(items.length / PER) * (TS + 34) + 18;
 });
 const y = Math.max(...colY);
 const H = y + 4;
-const frame = `<rect x="6" y="6" width="${W - 6}" height="${H - 6}" fill="#0a1226"/><rect x="0" y="0" width="${W - 6}" height="${H - 6}" fill="#5d6652"/><rect x="4" y="4" width="${W - 14}" height="${H - 14}" fill="#13213d"/><rect x="4" y="4" width="${W - 14}" height="10" fill="#1c2b4a"/>`;
+const frame = `<rect x="6" y="6" width="${W - 6}" height="${H - 6}" fill="#c3cfe0"/><rect x="0" y="0" width="${W - 6}" height="${H - 6}" fill="#7d8a9e"/><rect x="4" y="4" width="${W - 14}" height="${H - 14}" fill="#f6f8fc"/><rect x="4" y="4" width="${W - 14}" height="10" fill="#e4ecf8"/>`;
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Tech stack"><style>${font("Pixel", F + "pixel.woff2", 400)}${font("Nunito", F + "nunito-800.woff2", 800)}text{font-family:Nunito,Arial,sans-serif}.px{font-family:Pixel,monospace}</style>${frame}${out}</svg>`;
 writeFileSync(process.argv[2], svg);
 console.log("height", H);
