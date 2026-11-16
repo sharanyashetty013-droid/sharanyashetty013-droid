@@ -149,6 +149,8 @@ func contributions(user string) (total, streak, longest int, err error) {
 	if err := postJSON("https://api.github.com/graphql", map[string]any{"query": qy, "variables": map[string]string{"u": user, "f": from}},
 		map[string]string{"Authorization": "Bearer " + tok}, &y); err == nil {
 		log.Printf("this year: calendar %d, restricted %d", y.Data.User.CC.Cal.Total, y.Data.User.CC.Restricted)
+		// show exactly what the profile shows: "N contributions in <this year>"
+		return y.Data.User.CC.Cal.Total, streak, longest, nil
 	}
 	return out.Data.User.CC.Cal.Total, streak, longest, nil
 }
@@ -245,7 +247,7 @@ func statsSVG(c Config, s Stats) string {
 	const g, tw, th = 14.0, 266.0, 100.0
 	x0, y0 := 28.0, 70.0
 	y1 := y0 + th + g
-	tile(&b, x0, y0, tw, th, "bolt", "#00ADD8", "CONTRIBUTIONS", fmt.Sprint(s.Contributions), "last 12 months")
+	tile(&b, x0, y0, tw, th, "bolt", "#00ADD8", "CONTRIBUTIONS", fmt.Sprint(s.Contributions), "in "+fmt.Sprint(time.Now().Year()))
 	tile(&b, x0+tw+g, y0, tw, th, "flame", "#ff7b39", "STREAK", fmt.Sprintf("%d days", s.Streak), fmt.Sprintf("best %d days", s.Longest))
 	tile(&b, x0+2*(tw+g), y0, tw, th, "star", "#e0a800", "HACKATHON WINS", fmt.Sprint(c.Wins), "2nd · 3rd · 2nd")
 	// leetcode: wide tile with difficulty bars

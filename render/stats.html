@@ -83,7 +83,7 @@ function draw(t) {
   const cxs = stones.map(([x]) => x + SW / 2);
   const ys = stones.map(([, y]) => y);
 
-  carve("COMMITS", cxs[0], ys[0] + 62); glow(String(D.contributions), cxs[0], ys[0] + 146, 46, t, 0.0); carve("LAST 12 MO", cxs[0], ys[0] + 190, 12, "#cfc79a");
+  carve("COMMITS", cxs[0], ys[0] + 62); glow(String(D.contributions), cxs[0], ys[0] + 146, 46, t, 0.0); carve("IN " + new Date().getUTCFullYear(), cxs[0], ys[0] + 190, 12, "#cfc79a");
   carve("STREAK", cxs[1], ys[1] + 62); glow(String(D.streak), cxs[1], ys[1] + 150, 56, t, 1.5); carve("DAYS", cxs[1], ys[1] + 184, 14); carve("BEST " + D.best, cxs[1], ys[1] + 210, 12, "#cfc79a");
   carve("LEETCODE", cxs[2], ys[2] + 62); glow(String(D.lc.easy + D.lc.medium + D.lc.hard), cxs[2], ys[2] + 140, 50, t, 3.0);
   const mx = Math.max(D.lc.easy, D.lc.medium, D.lc.hard, 1);
