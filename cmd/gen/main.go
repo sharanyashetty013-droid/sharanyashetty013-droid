@@ -39,17 +39,19 @@ type Clue struct {
 }
 
 type Config struct {
-	User     string   `json:"user"`
-	LeetCode string   `json:"leetcode"`
-	Name     string   `json:"name"`
-	Tagline  string   `json:"tagline"`
-	Wins     int      `json:"wins"`
-	Projects int      `json:"projects"`
-	Lines    []string `json:"lines"`
-	Clues    []Clue   `json:"clues"`
-	Fallback Stats    `json:"fallback"`
-	Exclude  []string `json:"exclude_repos"`
-	OSS      []PR     `json:"fallback_merged"`
+	User        string    `json:"user"`
+	LeetCode    string    `json:"leetcode"`
+	Name        string    `json:"name"`
+	Tagline     string    `json:"tagline"`
+	Wins        int       `json:"wins"`
+	Projects    int       `json:"projects"`
+	Lines       []string  `json:"lines"`
+	Clues       []Clue    `json:"clues"`
+	Fallback    Stats     `json:"fallback"`
+	Exclude     []string  `json:"exclude_repos"`
+	OSS         []PR      `json:"fallback_merged"`
+	ProjectList []Project `json:"project_cards"`
+	Wins2       []Win     `json:"win_list"`
 }
 
 var client = &http.Client{Timeout: 20 * time.Second}
@@ -274,7 +276,7 @@ func main() {
 		log.Printf("merged PRs: using fallback (%v)", err)
 		prs = cfg.OSS
 	}
-	if err := updateOSS(prs); err != nil {
+	if err := updateOSS(writeCards(cfg, prs)); err != nil {
 		log.Fatal(err)
 	}
 	if err := os.WriteFile("assets/stats.svg", []byte(statsSVG(cfg, s)), 0o644); err != nil {
@@ -333,7 +335,7 @@ func mergedPRs(user string, exclude []string) ([]PR, error) {
 }
 
 // updateOSS rewrites the block between the OSS markers in README.md.
-func updateOSS(prs []PR) error {
+func updateOSS(block string) error {
 	raw, err := os.ReadFile("README.md")
 	if err != nil {
 		return err
@@ -346,9 +348,7 @@ func updateOSS(prs []PR) error {
 	}
 	var b strings.Builder
 	b.WriteString(start + "\n")
-	for _, p := range prs {
-		fmt.Fprintf(&b, "- **[%s](%s)** · %s\n", p.Repo, p.URL, p.Title)
-	}
+	b.WriteString(block)
 	b.WriteString(end)
 	return os.WriteFile("README.md", []byte(s[:i]+b.String()+s[j+len(end):]), 0o644)
 }

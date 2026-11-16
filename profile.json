@@ -4,7 +4,6 @@
   "name": "Sharanya L Shetty",
   "tagline": "backend · blockchain · problem solver",
   "wins": 3,
-  "projects": 3,
   "lines": [
     "Case #2026: a dev who ships backends in Go...",
     "Evidence: on-chain deposits. Scam-proof certificates.",
@@ -66,5 +65,57 @@
       "URL": "https://github.com/yalongwastaken/git-koi/pull/69",
       "Title": "action: support Windows runners"
     }
-  ]
+  ],
+  "win_list": [
+    {
+      "place": "silver",
+      "event": "HackXpo S-05",
+      "note": "Runner-up"
+    },
+    {
+      "place": "bronze",
+      "event": "Nexus Srinathon 2026 · SIT",
+      "note": "3rd place out of 250+ teams"
+    },
+    {
+      "place": "silver",
+      "event": "MLH Hacktoberfest",
+      "note": "Runner-up · open source"
+    }
+  ],
+  "project_cards": [
+    {
+      "slug": "walls",
+      "name": "Walls Don't Lie",
+      "url": "https://walls-dont-lie.vercel.app",
+      "desc": "Proof on every wall, deposit back in your hands. Rental deposits held in a smart contract and settled by photo proof, not phone calls.",
+      "tags": [
+        "Solidity",
+        "Sepolia",
+        "React"
+      ]
+    },
+    {
+      "slug": "provenrely",
+      "name": "Provenrely",
+      "url": "https://github.com/neilmalvalli-cyber/Provenrely",
+      "desc": "Tamper-proof, on-chain timestamped evidence certificates for flagged scam wallets, with an AI copilot that explains results in your language.",
+      "tags": [
+        "Blockchain",
+        "Go",
+        "24h buildathon"
+      ]
+    },
+    {
+      "slug": "portfolio",
+      "name": "Portfolio",
+      "url": "https://portfolioo-cyan-three.vercel.app/",
+      "desc": "All my projects, hackathons and experience in one place.",
+      "tags": [
+        "React",
+        "Vite"
+      ]
+    }
+  ],
+  "projects": 3
 }
