@@ -30,7 +30,7 @@
 
 <img src="./assets/cards/h-stats.svg" width="720" alt="Stats"/>
 
-<img src="./assets/stats-3955ad00.gif" width="720" alt="Player stats: contributions, streak, wins, LeetCode"/>
+<img src="./assets/stats-4fd4ae1a.gif" width="720" alt="Player stats: contributions, streak, wins, LeetCode"/>
 
 <img src="./assets/cards/h-find.svg" width="720" alt="Find me"/>
 
