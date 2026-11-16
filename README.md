@@ -1,24 +1,33 @@
-<a href="https://portfolioo-cyan-three.vercel.app/">
+<p align="center">
   <img src="./assets/banner.svg" width="100%" alt="Sharanya L Shetty — animated banner"/>
-</a>
+</p>
 
-```http
-HTTP/1.1 200 OK
-Server: sharanya.go
-X-Student: 2nd-year CSE @ NMAMIT
-X-Focus: backend, blockchain, problem-solving
-```
+<p align="center">
+  2nd-year CSE @ NMAMIT · building backends in Go and smart contracts in Solidity
+</p>
 
-### `→ GET /projects`
+<p align="center">
+  <img src="https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white" />
+  <img src="https://img.shields.io/badge/Solidity-363636?style=for-the-badge&logo=solidity&logoColor=white" />
+  <img src="https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=cplusplus&logoColor=white" />
+  <img src="https://img.shields.io/badge/C-A8B9CC?style=for-the-badge&logo=c&logoColor=black" />
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
+  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" />
+  <img src="https://img.shields.io/badge/Tailwind-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+  <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white" />
+</p>
 
-| project | what it does |
-|---|---|
-| ⛓️ **[SatoshiTrace](https://satoshitrace.vercel.app/)** | Bitcoin privacy intelligence tool that shows what the chain thinks is anonymous |
-| 🕵️ **[Coin UTXO](https://coinutxo.vercel.app/)** | crypto fraud attribution workspace: multi-hop tracing from scam wallet to exchange, with case reports |
-| 🌐 **[Portfolio](https://portfolioo-cyan-three.vercel.app/)** | all my projects in one place |
+## 🧱 Things I've built
 
-### `→ GET /open-source`
-<sub>auto-synced from GitHub every 6 hours ⟳</sub>
+**🧾 [Provenrely](https://github.com/neilmalvalli-cyber/Provenrely)**<br/>
+Tamper-proof, on-chain timestamped evidence certificates for flagged scam wallets, with an AI copilot that explains results in your language. Built in 24 hours at the MST Blockchain Buildathon.
+
+**🌐 [Portfolio](https://portfolioo-cyan-three.vercel.app/)**<br/>
+All my projects in one place.
+
+## 🌱 Open source
+<sub>auto-synced from GitHub every 6 hours</sub>
 
 <!--OSS:START-->
 - 🟢 **[yalongwastaken/git-koi#69](https://github.com/yalongwastaken/git-koi/pull/69)** · action: support Windows runners
@@ -28,54 +37,34 @@ X-Focus: backend, blockchain, problem-solving
 <sub>🟢 merged · 🟡 in review</sub>
 <!--OSS:END-->
 
-### `→ GET /hackathons`
+## 🏆 Hackathon wins
 
-| event | result |
-|---|---|
-| HackXpo S-05 | 🥈 runner-up |
-| Nexus Srinathon 2026 (SIT) | 🏅 consolation prize · top 30 of 250+ |
-| MLH Hacktoberfest | 🥈 runner-up · open source |
+- 🥈 **HackXpo S-05** · runner-up
+- 🏅 **Nexus Srinathon 2026 (SIT)** · consolation prize, top 30 of 250+
+- 🥈 **MLH Hacktoberfest** · runner-up, open source
 
-### `→ GET /stack`
+## 💬 Ask me about
 
-<p align="left">
-  <img src="https://img.shields.io/badge/Go-00ADD8?style=flat-square&logo=go&logoColor=white" />
-  <img src="https://img.shields.io/badge/Solidity-363636?style=flat-square&logo=solidity&logoColor=white" />
-  <img src="https://img.shields.io/badge/C++-00599C?style=flat-square&logo=cplusplus&logoColor=white" />
-  <img src="https://img.shields.io/badge/C-A8B9CC?style=flat-square&logo=c&logoColor=black" />
-  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black" />
-  <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
-  <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
-  <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" />
-  <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" />
-</p>
-
-### `→ GET /ask-me-about`
-
-```json
-["blockchain forensics", "Go APIs", "DSA", "public speaking 🎤"]
-```
+Blockchain forensics · Go APIs · DSA · public speaking 🎤<br/>
 <sub>fun fact: I trace stolen crypto for fun and call it a hobby</sub>
 
-### `→ GET /metrics`
+## 📊 Stats
 
 <p align="center">
-  <img src="https://streak-stats.demolab.com/?user=sharanyashetty013-droid&background=0d1117&ring=00ADD8&fire=FDDD00&currStreakNum=e6edf3&sideNums=e6edf3&currStreakLabel=00ADD8&sideLabels=00ADD8&dates=6e7681&stroke=00ADD8&hide_border=true" />
+  <img src="https://streak-stats.demolab.com/?user=sharanyashetty013-droid&background=F3FBFE&ring=00ADD8&fire=00ADD8&currStreakNum=0B2533&sideNums=0B2533&currStreakLabel=0089AD&sideLabels=0089AD&dates=7D8A93&stroke=BFEAF6&border=BFEAF6&border_radius=12" />
 </p>
 <p align="center">
   <img src="https://ghchart.rshah.org/00ADD8/sharanyashetty013-droid" width="90%" />
 </p>
 <p align="center">
-  <img src="https://leetcard.jacoblin.cool/sharanya_shetty01?theme=dark&font=Fira%20Code&ext=heatmap" />
+  <img src="https://leetcard.jacoblin.cool/sharanya_shetty01?theme=light&font=Fira%20Code&ext=heatmap" />
 </p>
 
-### `→ GET /contact`
+## 🔗 Find me
 
-<p align="left">
-  <a href="https://linkedin.com/in/sharanya-l-shetty-81156a424"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" /></a>
-  <a href="https://leetcode.com/u/sharanya_shetty01/"><img src="https://img.shields.io/badge/LeetCode-FFA116?style=flat-square&logo=leetcode&logoColor=black" /></a>
-  <a href="mailto:sharanyashetty013@gmail.com"><img src="https://img.shields.io/badge/Email-EA4335?style=flat-square&logo=gmail&logoColor=white" /></a>
-  <a href="https://www.instagram.com/shetty_sharanyyya/"><img src="https://img.shields.io/badge/Instagram-E4405F?style=flat-square&logo=instagram&logoColor=white" /></a>
+<p align="center">
+  <a href="https://linkedin.com/in/sharanya-l-shetty-81156a424"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" /></a>
+  <a href="https://leetcode.com/u/sharanya_shetty01/"><img src="https://img.shields.io/badge/LeetCode-FFA116?style=for-the-badge&logo=leetcode&logoColor=black" /></a>
+  <a href="mailto:sharanyashetty013@gmail.com"><img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" /></a>
+  <a href="https://www.instagram.com/shetty_sharanyyya/"><img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white" /></a>
 </p>
-
-<sub>`// the banner up top is generated by a Go program in this repo (cmd/gen) and refreshed by a GitHub Action`</sub>

@@ -244,21 +244,29 @@ func buildSVG(cfg Config, prs []PR) string {
 	var b strings.Builder
 	fmt.Fprintf(&b, `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="%d" height="%d" viewBox="0 0 %d %d" role="img" aria-label="%s: %s">`, W, H, W, H, esc(cfg.Name), esc(cfg.Tagline))
 	b.WriteString(`<style>
-text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;fill:#e6edf3}
-.name{font-family:"Segoe UI",Inter,"Helvetica Neue",Arial,sans-serif;font-weight:800;font-size:38px;letter-spacing:-.5px}
-.tag{font-size:14px;fill:#00ADD8}
+text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;fill:#13232d}
+.name{font-family:"Segoe UI",Inter,"Helvetica Neue",Arial,sans-serif;font-weight:800;font-size:38px;letter-spacing:-.5px;fill:#0b2533}
+.tag{font-size:14px;fill:#0089ad}
 .chip{font-size:12.5px}
 .dlg{font-size:16px}
-.dim{fill:#6e7681;font-size:11px}
+.dim{fill:#7d8a93;font-size:11px}
+.tw{animation:tw 2.4s ease-in-out infinite}@keyframes tw{0%,100%{opacity:.15;transform:scale(.6)}50%{opacity:1;transform:scale(1)}}
+.tw{transform-box:fill-box;transform-origin:center}
 .arrow{animation:bob .9s ease-in-out infinite alternate}@keyframes bob{to{transform:translateY(4px)}}
 .p{animation:rise linear infinite}@keyframes rise{0%{transform:translateY(0);opacity:0}15%{opacity:.9}100%{transform:translateY(-90px);opacity:0}}
 </style>`)
 	// background
-	fmt.Fprintf(&b, `<defs><radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#00ADD8" stop-opacity=".38"/><stop offset=".6" stop-color="#00ADD8" stop-opacity=".07"/><stop offset="1" stop-color="#00ADD8" stop-opacity="0"/></radialGradient>
-<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1a26"/><stop offset="1" stop-color="#0d1117"/></linearGradient></defs>`)
+	fmt.Fprintf(&b, `<defs><radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffffff" stop-opacity=".95"/><stop offset=".55" stop-color="#bfeaf6" stop-opacity=".55"/><stop offset="1" stop-color="#00ADD8" stop-opacity="0"/></radialGradient>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3fbfe"/><stop offset="1" stop-color="#dff3fa"/></linearGradient></defs>`)
 	fmt.Fprintf(&b, `<rect width="%d" height="%d" rx="16" fill="url(#bg)"/>`, W, H)
 	fmt.Fprintf(&b, `<rect x=".5" y=".5" width="%d" height="%d" rx="16" fill="none" stroke="#00ADD8" stroke-opacity=".35"/>`, W-1, H-1)
 	b.WriteString(`<circle cx="150" cy="190" r="180" fill="url(#glow)"><animate attributeName="r" values="170;188;170" dur="4s" repeatCount="indefinite"/></circle>`)
+	b.WriteString(`<circle cx="790" cy="40" r="90" fill="#00ADD8" fill-opacity=".07"/><circle cx="700" cy="370" r="70" fill="#00ADD8" fill-opacity=".06"/><circle cx="40" cy="350" r="60" fill="#00ADD8" fill-opacity=".05"/>`)
+	for i, p := range [][3]float64{{262, 60, 7}, {800, 168, 6}, {48, 120, 5}, {660, 34, 5}, {250, 300, 6}, {560, 175, 4}} {
+		x, y, r := p[0], p[1], p[2]
+		fmt.Fprintf(&b, `<path class="tw" style="animation-delay:-%.1fs" d="M%g %gQ%g %g %g %gQ%g %g %g %gQ%g %g %g %gQ%g %g %g %gZ" fill="#00ADD8"/>`,
+			float64(i)*0.4, x, y-r, x, y, x+r, y, x, y, x, y+r, x, y, x-r, y, x, y, x, y-r)
+	}
 
 	// floating particles
 	rng := rand.New(rand.NewSource(7))
@@ -270,7 +278,7 @@ text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",mo
 		y := 140 + rng.Float64()*230
 		r := 1 + rng.Float64()*1.8
 		dur := 4 + rng.Float64()*5
-		fmt.Fprintf(&b, `<circle class="p" cx="%.0f" cy="%.0f" r="%.1f" fill="#5DC9E2" style="animation-duration:%.1fs;animation-delay:-%.1fs"/>`, x, y, r, dur, rng.Float64()*dur)
+		fmt.Fprintf(&b, `<circle class="p" cx="%.0f" cy="%.0f" r="%.1f" fill="#00ADD8" fill-opacity=".45" style="animation-duration:%.1fs;animation-delay:-%.1fs"/>`, x, y, r, dur, rng.Float64()*dur)
 	}
 
 	// character: bob, skirt, blink
@@ -284,21 +292,21 @@ text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",mo
 	b.WriteString(fmt.Sprintf(`<text x="290" y="76" class="name">%s</text>`, esc(cfg.Name)))
 	b.WriteString(fmt.Sprintf(`<text x="292" y="104" class="tag">%s</text>`, esc(cfg.Tagline)))
 	chips := []struct{ label, color string }{
-		{fmt.Sprintf("● %d PRs merged", merged), "#3fb950"},
-		{fmt.Sprintf("◆ %d in review", review), "#FDDD00"},
-		{fmt.Sprintf("★ %d hackathon wins", cfg.Wins), "#00ADD8"},
+		{fmt.Sprintf("● %d PRs merged", merged), "#1a7f37"},
+		{fmt.Sprintf("◆ %d in review", review), "#b35900"},
+		{fmt.Sprintf("★ %d hackathon wins", cfg.Wins), "#0077a3"},
 	}
 	cx := 292.0
 	for _, c := range chips {
 		w := float64(len([]rune(c.label)))*7.6 + 22
-		fmt.Fprintf(&b, `<rect x="%.0f" y="122" width="%.0f" height="26" rx="13" fill="%s" fill-opacity=".1" stroke="%s" stroke-opacity=".55"/><text x="%.0f" y="139.5" class="chip" style="fill:%s">%s</text>`, cx, w, c.color, c.color, cx+11, c.color, esc(c.label))
+		fmt.Fprintf(&b, `<rect x="%.0f" y="122" width="%.0f" height="26" rx="13" fill="%s" fill-opacity=".08" stroke="%s" stroke-opacity=".5"/><text x="%.0f" y="139.5" class="chip" style="fill:%s">%s</text>`, cx, w, c.color, c.color, cx+11, c.color, esc(c.label))
 		cx += w + 10
 	}
 
 	// dialogue box (visual-novel style)
-	b.WriteString(`<rect x="290" y="196" width="548" height="154" rx="12" fill="#08121b" fill-opacity=".92" stroke="#00ADD8" stroke-width="2"/>`)
-	b.WriteString(`<rect x="296" y="202" width="536" height="142" rx="8" fill="none" stroke="#00ADD8" stroke-opacity=".25"/>`)
-	b.WriteString(`<rect x="308" y="182" width="118" height="30" rx="6" fill="#00ADD8"/><text x="322" y="202" style="font-weight:700;font-size:14px;fill:#062030;letter-spacing:2px">SHARANYA</text>`)
+	b.WriteString(`<rect x="290" y="199" width="548" height="154" rx="12" fill="#0089ad" fill-opacity=".12"/><rect x="290" y="196" width="548" height="154" rx="12" fill="#ffffff" stroke="#00ADD8" stroke-width="2"/>`)
+	b.WriteString(`<rect x="296" y="202" width="536" height="142" rx="8" fill="none" stroke="#00ADD8" stroke-opacity=".2"/>`)
+	b.WriteString(`<rect x="308" y="182" width="118" height="30" rx="6" fill="#00ADD8"/><text x="322" y="202" style="font-weight:700;font-size:14px;fill:#ffffff;letter-spacing:2px">SHARANYA</text>`)
 	for i, l := range lines {
 		b.WriteString(typing(i, l, 316, 258, len(lines), cycle))
 	}
