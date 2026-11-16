@@ -2,98 +2,96 @@
 <html><head><meta charset="utf-8">
 <style>
 @font-face{font-family:"Pixel";src:url("../assets/fonts/pixel.woff2") format("woff2")}
-@font-face{font-family:"Nunito";font-weight:800;src:url("../assets/fonts/nunito-800.woff2") format("woff2")}
-html,body{margin:0;background:#fff}canvas{display:block}
+html,body{margin:0;background:#000}canvas{display:block}
 </style></head>
-<body><canvas id="c" width="880" height="680"></canvas>
+<body><canvas id="c" width="880" height="620"></canvas>
 <script>
-// Cute light-blue stats card with mushroom friends. draw(t) is pure -> seamless GIF loop.
-const W = 880, H = 680, LOOP = 10, GROUND = 650;
-const D = Object.assign({contributions: 468, streak: 16, best: 17, lc: {easy: 40, medium: 18, hard: 3}, wins: 3, level: 6}, window.DATA || {});
+// Island Records: stats carved on standing stone tablets under the moon. Pure draw(t) -> seamless loop.
+const W = 880, H = 620, LOOP = 6, GROUND = 566;
+const D = Object.assign({contributions: 471, streak: 16, best: 17, lc: {easy: 40, medium: 18, hard: 3}, wins: 3, level: 6}, window.DATA || {});
 const ctx = document.getElementById("c").getContext("2d");
-const P = {};
-const load = n => new Promise(r => { const i = new Image(); i.onload = () => { P[n] = i; r(); }; i.src = "../assets/sprite/" + n + ".png"; });
-window.ready = (async () => { await Promise.all(["m_big", "m_base", "m_small"].map(load)); await document.fonts.load('12px "Pixel"'); await document.fonts.load('800 12px "Nunito"'); return true; })();
-const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); };
+const G = {};
+const load = (n, s) => new Promise(r => { const i = new Image(); i.onload = () => { G[n] = i; r(); }; i.src = s; });
+window.ready = (async () => { await load("bg", "../assets/sprite/" + "bg_moai.jpg"); await document.fonts.load('12px "Pixel"'); return true; })();
 const rnd = i => { const v = Math.sin(i * 91.7 + 13.3) * 43758.5453; return v - Math.floor(v); };
+const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
+const TAU = Math.PI * 2;
 
-function frame(x, y, w, h, fill) {
-  px(x + 6, y + 6, w - 6, h - 6, "#cfe7f6"); px(x, y, w - 6, h - 6, "#9ccfee"); px(x + 4, y + 4, w - 14, h - 14, fill);
-  [[x, y], [x + w - 10, y], [x, y + h - 10], [x + w - 10, y + h - 10]].forEach(([a, b]) => px(a, b, 4, 4, "#eaf6fd"));
+function stone(x, y, w, h, seed) {
+  const P = 4;
+  // soft moon-glow halo behind each stone
+  const g = ctx.createRadialGradient(x + w / 2, y + h * 0.35, 10, x + w / 2, y + h * 0.35, w);
+  g.addColorStop(0, "rgba(255,240,170,.18)"); g.addColorStop(1, "rgba(255,240,170,0)"); ctx.fillStyle = g; ctx.fillRect(x - w / 2, y - 40, w * 2, h);
+  // silhouette: slightly narrower toward the top, domed corners
+  for (let yy = 0; yy < h; yy += P) {
+    const inset = Math.round((1 - yy / h) * 2) * P;
+    const x0 = x + inset, x1 = x + w - inset;
+    px(x0 - P, y + yy, x1 - x0 + 2 * P, P, "#14181d");
+    for (let xx = x0; xx < x1; xx += P) {
+      const u = (xx - x0) / (x1 - x0), r = rnd(seed * 977 + xx * 3 + yy * 11);
+      let c = u < 0.1 ? "#3b434a" : u > 0.88 ? "#2c3238" : "#59624f";
+      if (u > 0.1 && u < 0.88) c = r > 0.96 ? "#8da34a" : r > 0.9 ? "#4c5546" : r > 0.84 ? "#68725d" : c;
+      if (yy < 2 * P) c = "#a8a47a";
+      if (u > 0.08 && u < 0.14 && yy > 2 * P) c = "#7c8070";        // lit left bevel
+      px(xx, y + yy, P, P, c);
+    }
+  }
+  // carved inner panel
+  px(x + 20, y + 22, w - 40, h - 44, "rgba(10,14,20,.42)");
+  px(x + 20, y + 22, w - 40, 3, "rgba(0,0,0,.35)"); px(x + 20, y + h - 25, w - 40, 3, "rgba(255,255,220,.12)");
+  // glyph columns along both sides of the panel
+  for (let i = 0; i < Math.floor((h - 60) / 22); i++) {
+    const k = Math.floor(rnd(seed * 51 + i) * 4), gy = y + 32 + i * 22;
+    const shapes = [[[0,0],[1,0],[1,1],[1,2],[0,2]], [[1,0],[0,1],[1,1],[2,1],[1,2]], [[0,0],[0,1],[0,2],[1,2],[2,2]], [[0,0],[2,0],[1,1],[0,2],[2,2]]];
+    [x + 26, x + w - 38].forEach((gx, side) => shapes[(k + side) % 4].forEach(([a, b]) => px(gx + a * 4, gy + b * 4, 4, 4, "#1d2228")));
+  }
+  // base sinks into the grass
+  px(x - 6, y + h - 6, w + 12, 10, "#4f7f1f"); for (let i = 0; i < w + 12; i += 6) px(x - 6 + i, y + h - 10 - (rnd(seed + i) * 6 | 0), 3, 8, "#9cc93b");
 }
-function tile(x, y, label, value, sub, extra) {
-  frame(x, y, 412, 150, "#ffffff"); px(x + 4, y + 4, 398, 8, "#eaf6fd");
-  ctx.fillStyle = "#4f7d9c"; ctx.font = '14px "Pixel"'; ctx.fillText(label, x + 24, y + 42);
-  ctx.fillStyle = "#123a5a"; ctx.font = '800 52px "Nunito"'; ctx.fillText(value, x + 22, y + 100);
-  if (sub) { ctx.fillStyle = "#6f97b3"; ctx.font = '800 19px "Nunito"'; ctx.fillText(sub, x + 24, y + 128); }
-  if (extra) extra(x, y);
+function glow(text, cx, y, size, t, ph) {
+  const p = 0.72 + 0.28 * Math.sin(t / LOOP * TAU * 2 + ph);
+  ctx.font = `${size}px "Pixel"`; ctx.textAlign = "center";
+  ctx.shadowColor = `rgba(255,214,70,${p})`; ctx.shadowBlur = 22 * p; ctx.fillStyle = "#ffe066"; ctx.fillText(text, cx, y);
+  ctx.shadowBlur = 0; ctx.globalAlpha = 0.4 * p; ctx.fillStyle = "#fffbe0"; ctx.fillText(text, cx, y); ctx.globalAlpha = 1; ctx.textAlign = "left";
 }
-function heart(x, y, s, a) { ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y); ctx.scale(s, s); ctx.fillStyle = "#ff8fab"; ctx.beginPath(); ctx.moveTo(0, 4); ctx.bezierCurveTo(0, 0, -7, -3, -7, 3); ctx.bezierCurveTo(-7, 8, 0, 11, 0, 14); ctx.bezierCurveTo(0, 11, 7, 8, 7, 3); ctx.bezierCurveTo(7, -3, 0, 0, 0, 4); ctx.fill(); ctx.restore(); }
-
-// group placement (source pixels -> card)
-const GS = 0.34, GX = 560, GY = GROUND;          // bottom-left of the stump group on the card
-function mushrooms(t) {
-  ctx.save(); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
-  // base (stump + little one) sits still: its image spans source y 700..1080
-  const bw = P.m_base.width * GS, bh = P.m_base.height * GS;
-  ctx.drawImage(P.m_base, GX, GY - bh, bw, bh);
-  // big mushroom: source box (40,290)-(690,820); its feet rest at source y~805 on the stump
-  const ph = Math.PI * 2 * t;
-  const sq = 1 + 0.05 * Math.sin(ph * 1.2), wig = 0.05 * Math.sin(ph * 0.6);
-  const footX = GX + (365 - 0) * GS, footY = GY - (1080 - 805) * GS;
-  ctx.save(); ctx.translate(footX, footY); ctx.rotate(wig); ctx.scale(2 - sq, sq);
-  const w = P.m_big.width * GS, h = P.m_big.height * GS;
-  ctx.drawImage(P.m_big, -(365 - 40) * GS, -(805 - 290) * GS, w, h);
-  // blink
-  const bt = t % 3.2;
-  if (bt > 3.0) { ctx.fillStyle = "#fef5e4"; [[330, 655], [468, 655]].forEach(([ex, ey]) => { const X = (ex - 365) * GS, Y = (ey - 805) * GS; ctx.beginPath(); ctx.ellipse(X, Y, 8, 9, 0, 0, 7); ctx.fill(); ctx.fillStyle = "#5e241c"; ctx.fillRect(X - 6, Y, 12, 2.5); ctx.fillStyle = "#fef5e4"; }); }
-  ctx.restore();
-  ctx.restore();
-  // hearts drift up from the big mushroom
-  for (let i = 0; i < 4; i++) { const u = ((t / LOOP) * 3 + i / 4) % 1; heart(footX + 70 + i * 12 + Math.sin(u * 6 + i) * 8, footY - 150 - u * 110, 1.3, Math.sin(u * Math.PI)); }
-}
-// little mushrooms hopping around the grass (seamless: each crosses W+120 per loop)
-function walkers(t) {
-  const S = 0.36, w = P.m_small.width * S, h = P.m_small.height * S;
-  [{dir: 1, off: 0, hop: 0.5}, {dir: -1, off: 420, hop: 0.42}, {dir: 1, off: 650, hop: 0.6}].forEach(m => {
-    const span = W + 120, x = ((m.off + m.dir * span * t / LOOP) % span + span) % span - 60;
-    if (x > GX - 20 && x < GX + 240) return;                       // don't walk through the stump
-    const u = (t / m.hop) % 1, y = GROUND - Math.sin(u * Math.PI) * 16;
-    const sq = u < 0.08 || u > 0.92 ? 0.9 : 1;
-    ctx.save(); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
-    ctx.fillStyle = "rgba(60,120,160,.18)"; ctx.beginPath(); ctx.ellipse(x, GROUND, 24, 5, 0, 0, 7); ctx.fill();
-    ctx.translate(x, y); ctx.scale(m.dir * (2 - sq), sq); ctx.drawImage(P.m_small, -w / 2, -h + 6, w, h);
-    ctx.restore();
-  });
-}
+function carve(text, cx, y, size = 14, c = "#e3dcab") { ctx.font = `${size}px "Pixel"`; ctx.textAlign = "center"; ctx.fillStyle = "rgba(0,0,0,.6)"; ctx.fillText(text, cx + 1, y + 2); ctx.fillStyle = c; ctx.fillText(text, cx, y); ctx.textAlign = "left"; }
 
 function draw(t) {
   t = ((t % LOOP) + LOOP) % LOOP;
-  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#f1f9fe"); g.addColorStop(1, "#dcf0fb");
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  frame(0, 0, W, H, "transparent");
-  ctx.fillStyle = g; ctx.fillRect(4, 4, W - 14, H - 14);
-  // soft hills + grass
-  ctx.fillStyle = "#cdebf8"; ctx.beginPath(); ctx.ellipse(200, GROUND + 40, 320, 120, 0, 0, 7); ctx.fill(); ctx.beginPath(); ctx.ellipse(720, GROUND + 50, 300, 130, 0, 0, 7); ctx.fill();
-  px(4, GROUND, W - 14, H - GROUND - 10, "#bfe8d2"); px(4, GROUND, W - 14, 5, "#a7dcc0");
-  for (let x = 20; x < W - 20; x += 46) { px(x, GROUND - 6, 3, 6, "#8fcfac"); px(x + 6, GROUND - 9, 3, 9, "#8fcfac"); }
+  ctx.imageSmoothingEnabled = false;
+  const sc = W / 736;
+  // sky + moon from the top of your picture, grass band from its lower part
+  ctx.drawImage(G.bg, 0, 0, 736, GROUND / sc, 0, 0, W, GROUND);
+  ctx.drawImage(G.bg, 0, 1050, 736, (H - GROUND) / sc, 0, GROUND, W, H - GROUND);
+  px(0, GROUND, W, 3, "#b4dc5a");
   // twinkles
-  for (let i = 0; i < 14; i++) { const tw = Math.sin(t * 3 + i * 2.3); if (tw > 0.5) { const x = 30 + rnd(i) * 800, y = 410 + rnd(i + 7) * 170; px(x, y - 5, 3, 13, "#9ccfee"); px(x - 5, y, 13, 3, "#9ccfee"); } }
+  for (let i = 0; i < 26; i++) { const tw = Math.sin(t / LOOP * TAU * (1 + i % 3) + i * 1.9); if (tw > 0.6) { const x = rnd(i) * W, y = rnd(i + 40) * 240; px(x, y, 3, 3, "#fff"); if (tw > 0.9) { px(x - 3, y + 1, 9, 1, "#cfe0ff"); px(x + 1, y - 3, 1, 9, "#cfe0ff"); } } }
 
-  ctx.fillStyle = "#123a5a"; ctx.font = '20px "Pixel"'; ctx.fillText("PLAYER STATS", 30, 52);
-  ctx.fillStyle = "#6f97b3"; ctx.font = '11px "Pixel"'; ctx.fillText("LIVE", 300, 50);
-  px(738, 22, 110, 42, "#123a5a"); ctx.fillStyle = "#ffe66d"; ctx.font = '18px "Pixel"'; ctx.fillText("LV " + D.level, 756, 52);
+  // title plaque
+  ctx.font = '22px "Pixel"'; ctx.textAlign = "left"; ctx.lineJoin = "miter"; ctx.lineWidth = 8; ctx.strokeStyle = "#0b1020";
+  ctx.strokeText("ISLAND RECORDS", 30, 50); ctx.fillStyle = "#fff"; ctx.fillText("ISLAND RECORDS", 30, 50);
+  px(748, 20, 104, 44, "#0b1020"); px(752, 24, 96, 36, "#1a2a4a"); glow("LV " + D.level, 800, 52, 18, t, 0);
 
-  tile(24, 76, "CONTRIBUTIONS", String(D.contributions), "last 12 months");
-  tile(446, 76, "STREAK", D.streak + " days", "best " + D.best + " days");
-  tile(24, 234, "LEETCODE", String(D.lc.easy + D.lc.medium + D.lc.hard), null, (x, y) => {
-    const bars = [["E", D.lc.easy, "#2cc3bd"], ["M", D.lc.medium, "#ffb700"], ["H", D.lc.hard, "#f05252"]], mx = Math.max(D.lc.easy, D.lc.medium, D.lc.hard, 1);
-    bars.forEach(([n, v, c], i) => { const bx = x + 150, by = y + 58 + i * 28; ctx.fillStyle = "#4f7d9c"; ctx.font = '12px "Pixel"'; ctx.fillText(n, bx, by + 14); px(bx + 22, by, 170, 16, "#e3f1f9"); px(bx + 22, by, Math.max(10, 170 * v / mx), 16, c); ctx.fillStyle = "#123a5a"; ctx.font = '800 18px "Nunito"'; ctx.fillText(String(v), bx + 200, by + 15); });
-  });
-  tile(446, 234, "HACKATHON WINS", String(D.wins), "2nd · 3rd · 2nd");
+  // four standing stones
+  const SW = 196, SH = 300, gap = 16, x0 = (W - 4 * SW - 3 * gap) / 2, top = GROUND - SH;
+  const stones = [0, 1, 2, 3].map(i => [x0 + i * (SW + gap), top + [10, 0, 14, 4][i]]);
+  stones.forEach(([x, y], i) => stone(x, y, SW, SH - [10, 0, 14, 4][i], i + 1));
+  const cxs = stones.map(([x]) => x + SW / 2);
+  const ys = stones.map(([, y]) => y);
 
-  walkers(t);
-  mushrooms(t);
+  carve("COMMITS", cxs[0], ys[0] + 62); glow(String(D.contributions), cxs[0], ys[0] + 146, 46, t, 0.0); carve("LAST 12 MO", cxs[0], ys[0] + 190, 12, "#cfc79a");
+  carve("STREAK", cxs[1], ys[1] + 62); glow(String(D.streak), cxs[1], ys[1] + 150, 56, t, 1.5); carve("DAYS", cxs[1], ys[1] + 184, 14); carve("BEST " + D.best, cxs[1], ys[1] + 210, 12, "#cfc79a");
+  carve("LEETCODE", cxs[2], ys[2] + 62); glow(String(D.lc.easy + D.lc.medium + D.lc.hard), cxs[2], ys[2] + 140, 50, t, 3.0);
+  const mx = Math.max(D.lc.easy, D.lc.medium, D.lc.hard, 1);
+  [["E", D.lc.easy], ["M", D.lc.medium], ["H", D.lc.hard]].forEach(([n, v], i) => { const bx = cxs[2] - 58, by = ys[2] + 160 + i * 22; ctx.font = '11px "Pixel"'; ctx.fillStyle = "#e3dcab"; ctx.fillText(n, bx - 14, by + 10); px(bx, by, 100, 10, "#1d2228"); ctx.shadowColor = "rgba(255,214,70,.8)"; ctx.shadowBlur = 8; px(bx, by, Math.max(6, 100 * v / mx), 10, "#ffe066"); ctx.shadowBlur = 0; ctx.fillStyle = "#fff3b0"; ctx.fillText(String(v), bx + 106, by + 10); });
+  carve("WINS", cxs[3], ys[3] + 62); glow(String(D.wins), cxs[3], ys[3] + 150, 64, t, 4.5); carve("HACKATHONS", cxs[3], ys[3] + 186, 12, "#cfc79a"); carve("2ND 3RD 2ND", cxs[3], ys[3] + 210, 11, "#cfc79a");
+
+  // fireflies drifting over the grass (each loops once per LOOP)
+  for (let i = 0; i < 10; i++) {
+    const u = (t / LOOP + rnd(i + 3)) % 1, x = (rnd(i) * W + u * 120) % W, y = GROUND - 30 - rnd(i + 8) * 200 + Math.sin(u * TAU * 2 + i) * 14;
+    const a = Math.sin(u * TAU * 3 + i) * 0.5 + 0.5;
+    ctx.globalAlpha = a; ctx.shadowColor = "#ffe066"; ctx.shadowBlur = 10; px(x, y, 4, 4, "#fff3a0"); ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+  }
 }
 window.draw = draw; window.LOOP = LOOP;
 </script></body></html>

@@ -33,8 +33,8 @@
 <img src="./assets/cards/h-find.svg" width="100%" alt="Find me"/>
 
 <p align="center">
-  <a href="https://linkedin.com/in/sharanya-l-shetty-81156a424"><img src="https://img.shields.io/badge/LinkedIn-3D8FC6?style=for-the-badge&logo=linkedin&logoColor=white" /></a>
-  <a href="https://leetcode.com/u/sharanya_shetty01/"><img src="https://img.shields.io/badge/LeetCode-5BA8DA?style=for-the-badge&logo=leetcode&logoColor=white" /></a>
-  <a href="mailto:sharanyashetty013@gmail.com"><img src="https://img.shields.io/badge/Email-3D8FC6?style=for-the-badge&logo=gmail&logoColor=white" /></a>
-  <a href="https://www.instagram.com/shetty_sharanyyya/"><img src="https://img.shields.io/badge/Instagram-5BA8DA?style=for-the-badge&logo=instagram&logoColor=white" /></a>
+  <a href="https://linkedin.com/in/sharanya-l-shetty-81156a424"><img src="https://img.shields.io/badge/LinkedIn-1A2B4F?style=for-the-badge&logo=linkedin&logoColor=FFE066" /></a>
+  <a href="https://leetcode.com/u/sharanya_shetty01/"><img src="https://img.shields.io/badge/LeetCode-1A2B4F?style=for-the-badge&logo=leetcode&logoColor=FFE066" /></a>
+  <a href="mailto:sharanyashetty013@gmail.com"><img src="https://img.shields.io/badge/Email-1A2B4F?style=for-the-badge&logo=gmail&logoColor=FFE066" /></a>
+  <a href="https://www.instagram.com/shetty_sharanyyya/"><img src="https://img.shields.io/badge/Instagram-1A2B4F?style=for-the-badge&logo=instagram&logoColor=FFE066" /></a>
 </p>
