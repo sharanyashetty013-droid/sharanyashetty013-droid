@@ -223,8 +223,8 @@ func statsSVG(c Config, s Stats) string {
 	const g, tw, th = 14.0, 266.0, 100.0
 	x0, y0 := 28.0, 70.0
 	y1 := y0 + th + g
-	tile(&b, x0, y0, tw, th, "bolt", "#00ADD8", "CONTRIBUTIONS", fmt.Sprint(s.Contributions), "this year")
-	tile(&b, x0+tw+g, y0, tw, th, "flame", "#ff7b39", "STREAK", fmt.Sprintf("%d days", s.Streak), fmt.Sprintf("best %d", s.Longest))
+	tile(&b, x0, y0, tw, th, "bolt", "#00ADD8", "CONTRIBUTIONS", fmt.Sprint(s.Contributions), "last 12 months")
+	tile(&b, x0+tw+g, y0, tw, th, "flame", "#ff7b39", "STREAK", fmt.Sprintf("%d days", s.Streak), fmt.Sprintf("best %d days", s.Longest))
 	tile(&b, x0+2*(tw+g), y0, tw, th, "star", "#e0a800", "HACKATHON WINS", fmt.Sprint(c.Wins), "2nd · 3rd · 2nd")
 	// leetcode: wide tile with difficulty bars
 	tile(&b, x0, y1, 2*tw+g, th, "code", "#ffa116", "LEETCODE", fmt.Sprint(solved), "solved")
