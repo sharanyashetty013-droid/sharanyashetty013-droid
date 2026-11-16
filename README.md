@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/banner-moai-3933152f.gif" width="100%" alt="Sharanya L Shetty — walking on Moai island"/>
+  <img src="./assets/banner-moai-a08df04c.gif" width="100%" alt="Sharanya L Shetty — walking on Moai island"/>
 </p>
 
 <p align="center">
