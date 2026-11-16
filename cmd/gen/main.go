@@ -286,7 +286,7 @@ func main() {
 type PR struct{ Repo, URL, Title string }
 
 func mergedPRs(user string, exclude []string) ([]PR, error) {
-	q := fmt.Sprintf("type:pr is:merged author:%s -user:%s", user, user)
+	q := fmt.Sprintf("type:pr author:%s -user:%s", user, user)
 	req, _ := http.NewRequest("GET", "https://api.github.com/search/issues?sort=updated&order=desc&per_page=30&q="+url.QueryEscape(q), nil)
 	req.Header.Set("Accept", "application/vnd.github+json")
 	if t := os.Getenv("GITHUB_TOKEN"); t != "" {
@@ -306,6 +306,10 @@ func mergedPRs(user string, exclude []string) ([]PR, error) {
 			Number        int    `json:"number"`
 			HTMLURL       string `json:"html_url"`
 			RepositoryURL string `json:"repository_url"`
+			State         string `json:"state"`
+			PullRequest   struct {
+				MergedAt *string `json:"merged_at"`
+			} `json:"pull_request"`
 		} `json:"items"`
 	}
 	if err := json.NewDecoder(res.Body).Decode(&out); err != nil {
@@ -318,15 +322,15 @@ func mergedPRs(user string, exclude []string) ([]PR, error) {
 	var prs []PR
 	for _, it := range out.Items {
 		repo := strings.TrimPrefix(it.RepositoryURL, "https://api.github.com/repos/")
-		if skip[strings.ToLower(repo)] {
-			continue
+		if skip[strings.ToLower(repo)] || (it.State == "closed" && it.PullRequest.MergedAt == nil) {
+			continue // closed without merging: leave it out
 		}
 		prs = append(prs, PR{fmt.Sprintf("%s#%d", repo, it.Number), it.HTMLURL, it.Title})
 	}
 	return prs, nil
 }
 
-// updateOSS rewrites the block between the OSS markers in README.md (merged PRs only).
+// updateOSS rewrites the block between the OSS markers in README.md.
 func updateOSS(prs []PR) error {
 	raw, err := os.ReadFile("README.md")
 	if err != nil {
@@ -341,7 +345,7 @@ func updateOSS(prs []PR) error {
 	var b strings.Builder
 	b.WriteString(start + "\n")
 	for _, p := range prs {
-		fmt.Fprintf(&b, "- 🟢 **[%s](%s)** · %s\n", p.Repo, p.URL, p.Title)
+		fmt.Fprintf(&b, "- **[%s](%s)** · %s\n", p.Repo, p.URL, p.Title)
 	}
 	b.WriteString(end)
 	return os.WriteFile("README.md", []byte(s[:i]+b.String()+s[j+len(end):]), 0o644)

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/banner-moai-611277f6.gif" width="100%" alt="Sharanya L Shetty — pixel Moai island game"/>
+  <img src="./assets/banner-moai-3933152f.gif" width="100%" alt="Sharanya L Shetty — walking on Moai island"/>
 </p>
 
 <p align="center">
@@ -29,11 +29,12 @@ Tamper-proof, on-chain timestamped evidence certificates for flagged scam wallet
 **🌐 [Portfolio](https://portfolioo-cyan-three.vercel.app/)**<br/>
 All my projects in one place.
 
-## 🌱 Open source (merged)
+## 🌱 Open source
 
 <!--OSS:START-->
-- 🟢 **[yalongwastaken/git-koi#69](https://github.com/yalongwastaken/git-koi/pull/69)** · action: support Windows runners
-- 🟢 **[rajputomsingh/Relay#124](https://github.com/rajputomsingh/Relay/pull/124)** · feat(health): add GET /v1/health service health endpoint
+- **[yalongwastaken/git-koi#69](https://github.com/yalongwastaken/git-koi/pull/69)** · action: support Windows runners
+- **[golang/go#82997](https://github.com/golang/go/pull/82997)** · encoding/json/v2: detect cycles in self-referential pointer types
+- **[rajputomsingh/Relay#124](https://github.com/rajputomsingh/Relay/pull/124)** · feat(health): add GET /v1/health service health endpoint
 <!--OSS:END-->
 
 ## 🏆 Hackathon wins
