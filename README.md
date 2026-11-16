@@ -14,16 +14,17 @@
 
 <img src="./assets/cards/h-oss.svg" width="100%" alt="Open source"/>
 <!--OSS:START-->
-<a href="https://github.com/yalongwastaken/git-koi/pull/69"><img src="./assets/cards/pr-0.svg" width="32%" alt="yalongwastaken/git-koi#69 · action: support Windows runners"/></a>
-<a href="https://github.com/golang/go/pull/82997"><img src="./assets/cards/pr-1.svg" width="32%" alt="golang/go#82997 · encoding/json/v2: detect cycles in self-referential pointer types"/></a>
-<a href="https://github.com/rajputomsingh/Relay/pull/124"><img src="./assets/cards/pr-2.svg" width="32%" alt="rajputomsingh/Relay#124 · feat(health): add GET /v1/health service health endpoint"/></a>
+<a href="https://github.com/csinitte/nexus-2026/pull/3"><img src="./assets/cards/pr-0.svg" width="32%" alt="csinitte/nexus-2026#3 · Panel: sliding cards for panelists"/></a>
+<a href="https://github.com/yalongwastaken/git-koi/pull/69"><img src="./assets/cards/pr-1.svg" width="32%" alt="yalongwastaken/git-koi#69 · action: support Windows runners"/></a>
+<a href="https://github.com/golang/go/pull/82997"><img src="./assets/cards/pr-2.svg" width="32%" alt="golang/go#82997 · encoding/json/v2: detect cycles in self-referential pointer types"/></a>
+<a href="https://github.com/rajputomsingh/Relay/pull/124"><img src="./assets/cards/pr-3.svg" width="32%" alt="rajputomsingh/Relay#124 · feat(health): add GET /v1/health service health endpoint"/></a>
 <!--OSS:END-->
 
 <img src="./assets/cards/h-wins.svg" width="100%" alt="Hackathon wins"/>
 <img src="./assets/cards/wins.svg" width="100%" alt="HackXpo S-05 runner-up · Nexus Srinathon 2026 3rd place · MLH Hacktoberfest runner-up"/>
 
 <img src="./assets/cards/h-stats.svg" width="100%" alt="Stats"/>
-<img src="./assets/stats-a5d32a8c.gif" width="100%" alt="Island Records: contributions, streak, LeetCode, hackathon wins"/>
+<img src="./assets/stats-c875c804.gif" width="100%" alt="Island Records: contributions, streak, LeetCode, hackathon wins"/>
 
 <img src="./assets/cards/h-find.svg" width="100%" alt="Find me"/>
 
