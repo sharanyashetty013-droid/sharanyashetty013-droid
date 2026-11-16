@@ -117,5 +117,85 @@
       ]
     }
   ],
-  "projects": 3
+  "projects": 3,
+  "stack": [
+    {
+      "name": "Languages",
+      "color": "#3d8fc6",
+      "items": [
+        "Go",
+        "Solidity",
+        "C++",
+        "C",
+        "Python",
+        "JavaScript",
+        "TypeScript",
+        "HTML/CSS"
+      ]
+    },
+    {
+      "name": "Blockchain",
+      "color": "#4a9ad3",
+      "items": [
+        "Ethereum · Sepolia",
+        "Bitcoin testnet",
+        "Foundry",
+        "Hardhat",
+        "IPFS · Pinata"
+      ]
+    },
+    {
+      "name": "Backend",
+      "color": "#3d8fc6",
+      "items": [
+        "Go APIs",
+        "Node.js",
+        "REST"
+      ]
+    },
+    {
+      "name": "Frontend",
+      "color": "#5ba8da",
+      "items": [
+        "React",
+        "Next.js",
+        "Vite",
+        "Tailwind CSS"
+      ]
+    },
+    {
+      "name": "AI & automation",
+      "color": "#4a9ad3",
+      "items": [
+        "n8n",
+        "OpenAI API",
+        "SerpApi",
+        "Ollama"
+      ]
+    },
+    {
+      "name": "Tools & deploy",
+      "color": "#5ba8da",
+      "items": [
+        "Git",
+        "GitHub Actions",
+        "Docker",
+        "Vercel",
+        "Linux · Bash",
+        "Figma",
+        "Google AI Studio",
+        "Antigravity",
+        "Stitch"
+      ]
+    },
+    {
+      "name": "Problem solving",
+      "color": "#3d8fc6",
+      "items": [
+        "DSA in C++",
+        "LeetCode",
+        "Striver A2Z"
+      ]
+    }
+  ]
 }

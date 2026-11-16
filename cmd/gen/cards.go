@@ -160,6 +160,64 @@ func winsSVG(wins []Win) string {
 	return b.String()
 }
 
+type StackGroup struct {
+	Name  string   `json:"name"`
+	Color string   `json:"color"`
+	Items []string `json:"items"`
+}
+
+// stackSVG lays chips out row by row, wrapping inside each category.
+var chipTop, chipBottom, chipRim, chipText = "#f2fbff", "#bfe7fb", "#8fcff2", "#0f4c75"
+
+func stackSVG(groups []StackGroup) string {
+	const W, padL, maxX = 880.0, 34.0, 840.0
+	type chip struct {
+		x, y, w     float64
+		text, color string
+	}
+	var chips []chip
+	var titles []struct {
+		y    float64
+		name string
+	}
+	y := 40.0
+	for _, g := range groups {
+		titles = append(titles, struct {
+			y    float64
+			name string
+		}{y + 18, g.Name})
+		y += 34
+		x := padL
+		for _, it := range g.Items {
+			w := float64(len([]rune(it)))*11 + 32
+			if x+w > maxX {
+				x = padL
+				y += 48
+			}
+			chips = append(chips, chip{x, y, w, it, g.Color})
+			x += w + 10
+		}
+		y += 64
+	}
+	h := y + 6
+	var b strings.Builder
+	svgOpen(&b, W, h, "Tech stack")
+	frame(&b, 0, 0, W, h, "#ffffff")
+	fmt.Fprintf(&b, `<rect x="4" y="4" width="866" height="10" fill="%s"/>`, cardBG)
+	for _, t := range titles {
+		fmt.Fprintf(&b, `<text x="%g" y="%g" class="px" style="font-size:14px;fill:%s">%s</text>`, padL, t.y, inkSoft, esc(strings.ToUpper(t.name)))
+	}
+	// glossy chips: gradient body, white shine on the top half, soft rim
+	b.WriteString(`<defs><linearGradient id="chipA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="` + chipTop + `"/><stop offset="1" stop-color="` + chipBottom + `"/></linearGradient></defs>`)
+	for _, c := range chips {
+		fmt.Fprintf(&b, `<rect x="%g" y="%g" width="%g" height="38" rx="19" fill="url(#chipA)" stroke="%s" stroke-width="1.5"/>`, c.x, c.y, c.w, chipRim)
+		fmt.Fprintf(&b, `<rect x="%g" y="%g" width="%g" height="15" rx="7.5" fill="#ffffff" fill-opacity=".38"/>`, c.x+6, c.y+3, c.w-12)
+		fmt.Fprintf(&b, `<text x="%g" y="%g" style="font-weight:800;font-size:19px;fill:%s">%s</text>`, c.x+16, c.y+26, chipText, esc(c.text))
+	}
+	b.WriteString(`</svg>`)
+	return b.String()
+}
+
 func writeFile(path, s string) {
 	if err := os.WriteFile(path, []byte(s), 0o644); err != nil {
 		panic(err)
@@ -177,6 +235,7 @@ func writeCards(cfg Config, prs []PR) string {
 		writeFile("assets/cards/p-"+p.Slug+".svg", projectSVG(p))
 	}
 	writeFile("assets/cards/wins.svg", winsSVG(cfg.Wins2))
+	writeFile("assets/cards/h-stack.svg", headerSVG("Tech stack"))
 	// remove stale PR cards, then write current ones
 	if old, err := os.ReadDir("assets/cards"); err == nil {
 		for _, f := range old {

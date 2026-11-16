@@ -2,5 +2,10 @@
   "name": "profile-stats-render",
   "private": true,
   "type": "module",
-  "dependencies": { "puppeteer-core": "^23.0.0" }
+  "dependencies": {
+    "puppeteer-core": "^23.0.0",
+    "@iconify-json/skill-icons": "^1.2.0",
+    "@iconify-json/logos": "^1.2.0",
+    "@iconify-json/simple-icons": "^1.2.0"
+  }
 }

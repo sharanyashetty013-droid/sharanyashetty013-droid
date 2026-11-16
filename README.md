@@ -4,17 +4,9 @@
 
 <img src="./assets/cards/intro.svg" width="100%" alt="2nd-year CSE @ NMAMIT · building backends in Go and smart contracts in Solidity"/>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Go-3D8FC6?style=for-the-badge&logo=go&logoColor=white" />
-  <img src="https://img.shields.io/badge/Solidity-5BA8DA?style=for-the-badge&logo=solidity&logoColor=white" />
-  <img src="https://img.shields.io/badge/C++-3D8FC6?style=for-the-badge&logo=cplusplus&logoColor=white" />
-  <img src="https://img.shields.io/badge/C-5BA8DA?style=for-the-badge&logo=c&logoColor=white" />
-  <img src="https://img.shields.io/badge/JavaScript-3D8FC6?style=for-the-badge&logo=javascript&logoColor=white" />
-  <img src="https://img.shields.io/badge/Next.js-5BA8DA?style=for-the-badge&logo=nextdotjs&logoColor=white" />
-  <img src="https://img.shields.io/badge/Tailwind-3D8FC6?style=for-the-badge&logo=tailwindcss&logoColor=white" />
-  <img src="https://img.shields.io/badge/Docker-5BA8DA?style=for-the-badge&logo=docker&logoColor=white" />
-  <img src="https://img.shields.io/badge/Git-3D8FC6?style=for-the-badge&logo=git&logoColor=white" />
-</p>
+<img src="./assets/cards/h-stack.svg" width="100%" alt="Tech stack"/>
+
+<img src="./assets/cards/stack.svg" width="100%" alt="Tech stack: Go, Solidity, C++, C, Python, JavaScript, TypeScript, HTML, CSS, Ethereum, Bitcoin, Hardhat, Foundry, IPFS, Node.js, React, Next.js, Vite, Tailwind, n8n, OpenAI, Ollama, Git, GitHub Actions, Docker, Vercel, Linux, Bash, Figma, LeetCode"/>
 
 <img src="./assets/cards/h-built.svg" width="100%" alt="Things I've built"/>
 

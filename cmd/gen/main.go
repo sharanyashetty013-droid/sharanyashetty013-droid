@@ -39,19 +39,20 @@ type Clue struct {
 }
 
 type Config struct {
-	User        string    `json:"user"`
-	LeetCode    string    `json:"leetcode"`
-	Name        string    `json:"name"`
-	Tagline     string    `json:"tagline"`
-	Wins        int       `json:"wins"`
-	Projects    int       `json:"projects"`
-	Lines       []string  `json:"lines"`
-	Clues       []Clue    `json:"clues"`
-	Fallback    Stats     `json:"fallback"`
-	Exclude     []string  `json:"exclude_repos"`
-	OSS         []PR      `json:"fallback_merged"`
-	ProjectList []Project `json:"project_cards"`
-	Wins2       []Win     `json:"win_list"`
+	User        string       `json:"user"`
+	LeetCode    string       `json:"leetcode"`
+	Name        string       `json:"name"`
+	Tagline     string       `json:"tagline"`
+	Wins        int          `json:"wins"`
+	Projects    int          `json:"projects"`
+	Lines       []string     `json:"lines"`
+	Clues       []Clue       `json:"clues"`
+	Fallback    Stats        `json:"fallback"`
+	Exclude     []string     `json:"exclude_repos"`
+	OSS         []PR         `json:"fallback_merged"`
+	ProjectList []Project    `json:"project_cards"`
+	Wins2       []Win        `json:"win_list"`
+	Stack       []StackGroup `json:"stack"`
 }
 
 var client = &http.Client{Timeout: 20 * time.Second}
