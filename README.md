@@ -23,7 +23,7 @@
 <img src="./assets/cards/wins.svg" width="100%" alt="HackXpo S-05 runner-up · Nexus Srinathon 2026 3rd place · MLH Hacktoberfest runner-up"/>
 
 <img src="./assets/cards/h-stats.svg" width="100%" alt="Stats"/>
-<img src="./assets/stats-3f421deb.gif" width="100%" alt="Island Records: contributions, streak, LeetCode, hackathon wins"/>
+<img src="./assets/stats-ea64a52c.gif" width="100%" alt="Island Records: contributions, streak, LeetCode, hackathon wins"/>
 
 <img src="./assets/cards/h-find.svg" width="100%" alt="Find me"/>
 
