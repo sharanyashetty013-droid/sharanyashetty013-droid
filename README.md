@@ -1,34 +1,45 @@
-<p align="center">
-  <img src="./terminal-banner.svg" width="100%" alt="Sharanya Shetty - animated Minecraft banner"/>
-</p>
+<a href="https://portfolioo-cyan-three.vercel.app/">
+  <img src="./assets/server.svg" width="100%" alt="Sharanya's live HTTP server: a pixel character catching requests and throwing back 200 OK responses"/>
+</a>
 
-<h3 align="center"> 2nd-year Computer Science & Engineering @ NMAMIT </h3>
+```http
+HTTP/1.1 200 OK
+Server: sharanya.go
+X-Student: 2nd-year CSE @ NMAMIT
+X-Focus: backend, blockchain, problem-solving
+```
 
----
+### `→ GET /projects`
 
-### 🧱 Things I've built
+| project | what it does |
+|---|---|
+| ⛓️ **[SatoshiTrace](https://satoshitrace.vercel.app/)** | Bitcoin privacy intelligence tool that shows what the chain thinks is anonymous |
+| 🕵️ **[Coin UTXO](https://coinutxo.vercel.app/)** | crypto fraud attribution workspace: multi-hop tracing from scam wallet to exchange, with case reports |
+| 🌐 **[Portfolio](https://portfolioo-cyan-three.vercel.app/)** | all my projects in one place |
 
-- ⛓️ **[SatoshiTrace](https://satoshitrace.vercel.app/)**: Bitcoin privacy intelligence tool that shows what the chain thinks is anonymous
-- 🕵️ **[Coin UTXO](https://coinutxo.vercel.app/)**: crypto fraud attribution workspace. Multi-hop tracing from scam wallet to exchange, with case reports
-- 🌐 **[Portfolio](https://portfolioo-cyan-three.vercel.app/)** all my projects in one place
+### `→ GET /open-source`
+<sub>auto-synced from GitHub every 6 hours ⟳</sub>
 
-### 🎒 Inventory
+<!--OSS:START-->
+| request | repo | what | status |
+|---|---|---|---|
+| `POST /pulls` | [yalongwastaken/git-koi#69](https://github.com/yalongwastaken/git-koi/pull/69) | action: support Windows runners | 🟢 merged |
+| `POST /pulls` | [golang/go#82997](https://github.com/golang/go/pull/82997) | encoding/json/v2: detect cycles in self-referential pointer types | 🟡 in review |
+| `POST /pulls` | [rajputomsingh/Relay#124](https://github.com/rajputomsingh/Relay/pull/124) | feat(health): add GET /v1/health service health endpoint | 🟢 merged |
+| `POST /pulls` | [neilmalvalli-cyber/Provenrely#3](https://github.com/neilmalvalli-cyber/Provenrely/pull/3) | feat: implement Provenrely backend engines (scan, certificates, copilot) | 🟢 merged |
+| `POST /pulls` | [neilmalvalli-cyber/Provenrely#1](https://github.com/neilmalvalli-cyber/Provenrely/pull/1) | style: format Solidity files with forge fmt | 🟢 merged |
+<!--OSS:END-->
 
--  **Currently learning:** Go · Solidity · System Design · DSA (C++)
--  **Ask me about:** Blockchain forensics, Go APIs, DSA, public speaking 🎤
--  **Reach me:** sharanyashetty013@gmail.com
--  **Fun fact:** I trace stolen crypto for fun and call it a hobby
+### `→ GET /hackathons`
 
-### 🔗 Connect with me
+| event | result |
+|---|---|
+| HackXpo S-05 | 🥈 runner-up |
+| Nexus Srinathon 2026 (SIT) | 🏅 consolation prize · top 30 of 250+ |
+| MLH Hacktoberfest | 🥈 runner-up · open source |
+| RecHersion Hackathon · NITK | participant |
 
-<p align="left">
-  <a href="https://linkedin.com/in/sharanya-l-shetty-81156a424"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" /></a>
-  <a href="https://leetcode.com/u/sharanya_shetty01/"><img src="https://img.shields.io/badge/LeetCode-FFA116?style=flat-square&logo=leetcode&logoColor=black" /></a>
-  <a href="mailto:sharanyashetty013@gmail.com"><img src="https://img.shields.io/badge/Email-EA4335?style=flat-square&logo=gmail&logoColor=white" /></a>
-  <a href="https://www.instagram.com/shetty_sharanyyya/"><img src="https://img.shields.io/badge/Instagram-E4405F?style=flat-square&logo=instagram&logoColor=white" /></a>
-</p>
-
-### 🛠️ Tools
+### `→ GET /stack`
 
 <p align="left">
   <img src="https://img.shields.io/badge/Go-00ADD8?style=flat-square&logo=go&logoColor=white" />
@@ -42,20 +53,32 @@
   <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white" />
 </p>
 
-### 📊 GitHub stats
+### `→ GET /ask-me-about`
+
+```json
+["blockchain forensics", "Go APIs", "DSA", "public speaking 🎤"]
+```
+<sub>fun fact: I trace stolen crypto for fun and call it a hobby</sub>
+
+### `→ GET /metrics`
 
 <p align="center">
-  <img src="https://streak-stats.demolab.com/?user=sharanyashetty013-droid&background=2b1d12&ring=5da130&fire=5da130&currStreakNum=ffffff&sideNums=ffffff&currStreakLabel=7bc043&sideLabels=7bc043&dates=c9b28a&hide_border=true" />
+  <img src="https://streak-stats.demolab.com/?user=sharanyashetty013-droid&background=0d1117&ring=00ADD8&fire=FDDD00&currStreakNum=e6edf3&sideNums=e6edf3&currStreakLabel=00ADD8&sideLabels=00ADD8&dates=6e7681&stroke=00ADD8&hide_border=true" />
 </p>
-
 <p align="center">
-  <img src="https://ghchart.rshah.org/5da130/sharanyashetty013-droid" width="90%" />
+  <img src="https://ghchart.rshah.org/00ADD8/sharanyashetty013-droid" width="90%" />
 </p>
-
-### 🧠 LeetCode
-
 <p align="center">
   <img src="https://leetcard.jacoblin.cool/sharanya_shetty01?theme=dark&font=Fira%20Code&ext=heatmap" />
 </p>
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:866043,100:5da130&height=60&section=footer" width="100%"/>
+### `→ GET /contact`
+
+<p align="left">
+  <a href="https://linkedin.com/in/sharanya-l-shetty-81156a424"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" /></a>
+  <a href="https://leetcode.com/u/sharanya_shetty01/"><img src="https://img.shields.io/badge/LeetCode-FFA116?style=flat-square&logo=leetcode&logoColor=black" /></a>
+  <a href="mailto:sharanyashetty013@gmail.com"><img src="https://img.shields.io/badge/Email-EA4335?style=flat-square&logo=gmail&logoColor=white" /></a>
+  <a href="https://www.instagram.com/shetty_sharanyyya/"><img src="https://img.shields.io/badge/Instagram-E4405F?style=flat-square&logo=instagram&logoColor=white" /></a>
+</p>
+
+<sub>`// the server up top is generated by a Go program in this repo (cmd/gen) and redeployed by a GitHub Action`</sub>
