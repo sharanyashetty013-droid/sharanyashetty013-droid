@@ -279,6 +279,12 @@ func main() {
 	if err := updateOSS(writeCards(cfg, prs)); err != nil {
 		log.Fatal(err)
 	}
+	sd := map[string]any{"contributions": s.Contributions, "streak": s.Streak, "best": s.Longest, "wins": cfg.Wins, "level": level(s, cfg),
+		"lc": map[string]int{"easy": s.LeetCode.Easy, "medium": s.LeetCode.Medium, "hard": s.LeetCode.Hard}}
+	sj, _ := json.MarshalIndent(sd, "", "  ")
+	if err := os.WriteFile("assets/stats-data.json", append(sj, '\n'), 0o644); err != nil {
+		log.Fatal(err)
+	}
 	if err := os.WriteFile("assets/stats.svg", []byte(statsSVG(cfg, s)), 0o644); err != nil {
 		log.Fatal(err)
 	}

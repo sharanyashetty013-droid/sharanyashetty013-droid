@@ -1,0 +1,99 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:"Pixel";src:url("../assets/fonts/pixel.woff2") format("woff2")}
+@font-face{font-family:"Nunito";font-weight:800;src:url("../assets/fonts/nunito-800.woff2") format("woff2")}
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="880" height="680"></canvas>
+<script>
+// Cute light-blue stats card with mushroom friends. draw(t) is pure -> seamless GIF loop.
+const W = 880, H = 680, LOOP = 10, GROUND = 650;
+const D = Object.assign({contributions: 468, streak: 16, best: 17, lc: {easy: 40, medium: 18, hard: 3}, wins: 3, level: 6}, window.DATA || {});
+const ctx = document.getElementById("c").getContext("2d");
+const P = {};
+const load = n => new Promise(r => { const i = new Image(); i.onload = () => { P[n] = i; r(); }; i.src = "../assets/sprite/" + n + ".png"; });
+window.ready = (async () => { await Promise.all(["m_big", "m_base", "m_small"].map(load)); await document.fonts.load('12px "Pixel"'); await document.fonts.load('800 12px "Nunito"'); return true; })();
+const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); };
+const rnd = i => { const v = Math.sin(i * 91.7 + 13.3) * 43758.5453; return v - Math.floor(v); };
+
+function frame(x, y, w, h, fill) {
+  px(x + 6, y + 6, w - 6, h - 6, "#cfe7f6"); px(x, y, w - 6, h - 6, "#9ccfee"); px(x + 4, y + 4, w - 14, h - 14, fill);
+  [[x, y], [x + w - 10, y], [x, y + h - 10], [x + w - 10, y + h - 10]].forEach(([a, b]) => px(a, b, 4, 4, "#eaf6fd"));
+}
+function tile(x, y, label, value, sub, extra) {
+  frame(x, y, 412, 150, "#ffffff"); px(x + 4, y + 4, 398, 8, "#eaf6fd");
+  ctx.fillStyle = "#4f7d9c"; ctx.font = '14px "Pixel"'; ctx.fillText(label, x + 24, y + 42);
+  ctx.fillStyle = "#123a5a"; ctx.font = '800 52px "Nunito"'; ctx.fillText(value, x + 22, y + 100);
+  if (sub) { ctx.fillStyle = "#6f97b3"; ctx.font = '800 19px "Nunito"'; ctx.fillText(sub, x + 24, y + 128); }
+  if (extra) extra(x, y);
+}
+function heart(x, y, s, a) { ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y); ctx.scale(s, s); ctx.fillStyle = "#ff8fab"; ctx.beginPath(); ctx.moveTo(0, 4); ctx.bezierCurveTo(0, 0, -7, -3, -7, 3); ctx.bezierCurveTo(-7, 8, 0, 11, 0, 14); ctx.bezierCurveTo(0, 11, 7, 8, 7, 3); ctx.bezierCurveTo(7, -3, 0, 0, 0, 4); ctx.fill(); ctx.restore(); }
+
+// group placement (source pixels -> card)
+const GS = 0.34, GX = 560, GY = GROUND;          // bottom-left of the stump group on the card
+function mushrooms(t) {
+  ctx.save(); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+  // base (stump + little one) sits still: its image spans source y 700..1080
+  const bw = P.m_base.width * GS, bh = P.m_base.height * GS;
+  ctx.drawImage(P.m_base, GX, GY - bh, bw, bh);
+  // big mushroom: source box (40,290)-(690,820); its feet rest at source y~805 on the stump
+  const ph = Math.PI * 2 * t;
+  const sq = 1 + 0.05 * Math.sin(ph * 1.2), wig = 0.05 * Math.sin(ph * 0.6);
+  const footX = GX + (365 - 0) * GS, footY = GY - (1080 - 805) * GS;
+  ctx.save(); ctx.translate(footX, footY); ctx.rotate(wig); ctx.scale(2 - sq, sq);
+  const w = P.m_big.width * GS, h = P.m_big.height * GS;
+  ctx.drawImage(P.m_big, -(365 - 40) * GS, -(805 - 290) * GS, w, h);
+  // blink
+  const bt = t % 3.2;
+  if (bt > 3.0) { ctx.fillStyle = "#fef5e4"; [[330, 655], [468, 655]].forEach(([ex, ey]) => { const X = (ex - 365) * GS, Y = (ey - 805) * GS; ctx.beginPath(); ctx.ellipse(X, Y, 8, 9, 0, 0, 7); ctx.fill(); ctx.fillStyle = "#5e241c"; ctx.fillRect(X - 6, Y, 12, 2.5); ctx.fillStyle = "#fef5e4"; }); }
+  ctx.restore();
+  ctx.restore();
+  // hearts drift up from the big mushroom
+  for (let i = 0; i < 4; i++) { const u = ((t / LOOP) * 3 + i / 4) % 1; heart(footX + 70 + i * 12 + Math.sin(u * 6 + i) * 8, footY - 150 - u * 110, 1.3, Math.sin(u * Math.PI)); }
+}
+// little mushrooms hopping around the grass (seamless: each crosses W+120 per loop)
+function walkers(t) {
+  const S = 0.36, w = P.m_small.width * S, h = P.m_small.height * S;
+  [{dir: 1, off: 0, hop: 0.5}, {dir: -1, off: 420, hop: 0.42}, {dir: 1, off: 650, hop: 0.6}].forEach(m => {
+    const span = W + 120, x = ((m.off + m.dir * span * t / LOOP) % span + span) % span - 60;
+    if (x > GX - 20 && x < GX + 240) return;                       // don't walk through the stump
+    const u = (t / m.hop) % 1, y = GROUND - Math.sin(u * Math.PI) * 16;
+    const sq = u < 0.08 || u > 0.92 ? 0.9 : 1;
+    ctx.save(); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+    ctx.fillStyle = "rgba(60,120,160,.18)"; ctx.beginPath(); ctx.ellipse(x, GROUND, 24, 5, 0, 0, 7); ctx.fill();
+    ctx.translate(x, y); ctx.scale(m.dir * (2 - sq), sq); ctx.drawImage(P.m_small, -w / 2, -h + 6, w, h);
+    ctx.restore();
+  });
+}
+
+function draw(t) {
+  t = ((t % LOOP) + LOOP) % LOOP;
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#f1f9fe"); g.addColorStop(1, "#dcf0fb");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  frame(0, 0, W, H, "transparent");
+  ctx.fillStyle = g; ctx.fillRect(4, 4, W - 14, H - 14);
+  // soft hills + grass
+  ctx.fillStyle = "#cdebf8"; ctx.beginPath(); ctx.ellipse(200, GROUND + 40, 320, 120, 0, 0, 7); ctx.fill(); ctx.beginPath(); ctx.ellipse(720, GROUND + 50, 300, 130, 0, 0, 7); ctx.fill();
+  px(4, GROUND, W - 14, H - GROUND - 10, "#bfe8d2"); px(4, GROUND, W - 14, 5, "#a7dcc0");
+  for (let x = 20; x < W - 20; x += 46) { px(x, GROUND - 6, 3, 6, "#8fcfac"); px(x + 6, GROUND - 9, 3, 9, "#8fcfac"); }
+  // twinkles
+  for (let i = 0; i < 14; i++) { const tw = Math.sin(t * 3 + i * 2.3); if (tw > 0.5) { const x = 30 + rnd(i) * 800, y = 410 + rnd(i + 7) * 170; px(x, y - 5, 3, 13, "#9ccfee"); px(x - 5, y, 13, 3, "#9ccfee"); } }
+
+  ctx.fillStyle = "#123a5a"; ctx.font = '20px "Pixel"'; ctx.fillText("PLAYER STATS", 30, 52);
+  ctx.fillStyle = "#6f97b3"; ctx.font = '11px "Pixel"'; ctx.fillText("LIVE", 300, 50);
+  px(738, 22, 110, 42, "#123a5a"); ctx.fillStyle = "#ffe66d"; ctx.font = '18px "Pixel"'; ctx.fillText("LV " + D.level, 756, 52);
+
+  tile(24, 76, "CONTRIBUTIONS", String(D.contributions), "last 12 months");
+  tile(446, 76, "STREAK", D.streak + " days", "best " + D.best + " days");
+  tile(24, 234, "LEETCODE", String(D.lc.easy + D.lc.medium + D.lc.hard), null, (x, y) => {
+    const bars = [["E", D.lc.easy, "#2cc3bd"], ["M", D.lc.medium, "#ffb700"], ["H", D.lc.hard, "#f05252"]], mx = Math.max(D.lc.easy, D.lc.medium, D.lc.hard, 1);
+    bars.forEach(([n, v, c], i) => { const bx = x + 150, by = y + 58 + i * 28; ctx.fillStyle = "#4f7d9c"; ctx.font = '12px "Pixel"'; ctx.fillText(n, bx, by + 14); px(bx + 22, by, 170, 16, "#e3f1f9"); px(bx + 22, by, Math.max(10, 170 * v / mx), 16, c); ctx.fillStyle = "#123a5a"; ctx.font = '800 18px "Nunito"'; ctx.fillText(String(v), bx + 200, by + 15); });
+  });
+  tile(446, 234, "HACKATHON WINS", String(D.wins), "2nd · 3rd · 2nd");
+
+  walkers(t);
+  mushrooms(t);
+}
+window.draw = draw; window.LOOP = LOOP;
+</script></body></html>

@@ -8,6 +8,7 @@ on:
     paths:
       - profile.json
       - cmd/gen/**
+      - render/**
 
 permissions:
   contents: write
@@ -20,10 +21,21 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: live stats
         run: go run ./cmd/gen
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: render animated stats (only when the numbers or the scene changed)
+        run: |
+          if git diff --quiet HEAD -- assets/stats-data.json render && ls assets/stats-*.gif >/dev/null 2>&1; then
+            echo "stats unchanged, keeping the current GIF"; exit 0
+          fi
+          command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+          cd render && npm ci --silent && cd ..
+          node render/render.mjs
       - name: commit if changed
         run: |
           git config user.name  "sharanya-bot"
