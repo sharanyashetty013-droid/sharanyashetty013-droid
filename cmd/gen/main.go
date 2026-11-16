@@ -257,6 +257,7 @@ text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",mo
 </style>`)
 	// background
 	fmt.Fprintf(&b, `<defs><radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffffff" stop-opacity=".95"/><stop offset=".55" stop-color="#bfeaf6" stop-opacity=".55"/><stop offset="1" stop-color="#00ADD8" stop-opacity="0"/></radialGradient>
+<linearGradient id="xpg" x1="0" x2="1"><stop offset="0" stop-color="#00ADD8"/><stop offset="1" stop-color="#5DE0B5"/></linearGradient>
 <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3fbfe"/><stop offset="1" stop-color="#dff3fa"/></linearGradient></defs>`)
 	fmt.Fprintf(&b, `<rect width="%d" height="%d" rx="16" fill="url(#bg)"/>`, W, H)
 	fmt.Fprintf(&b, `<rect x=".5" y=".5" width="%d" height="%d" rx="16" fill="none" stroke="#00ADD8" stroke-opacity=".35"/>`, W-1, H-1)
@@ -281,12 +282,58 @@ text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",mo
 		fmt.Fprintf(&b, `<circle class="p" cx="%.0f" cy="%.0f" r="%.1f" fill="#00ADD8" fill-opacity=".45" style="animation-duration:%.1fs;animation-delay:-%.1fs"/>`, x, y, r, dur, rng.Float64()*dur)
 	}
 
+	// ---- game layer ----
+	xp := merged*500 + review*200 + cfg.Wins*300
+	const perLevel = 750
+	level := 1 + xp/perLevel
+	frac := float64(xp%perLevel) / perLevel
+	questSlot := -1
+	for i, l := range lines {
+		if lastMerged != "" && strings.Contains(l, lastMerged) {
+			questSlot = i
+		}
+	}
+	questJump, hud := "", ""
+	{
+		var h strings.Builder
+		// hearts + level, top-left
+		for i := 0; i < 5; i++ {
+			x := 22 + float64(i)*20
+			fmt.Fprintf(&h, `<path transform="translate(%.0f 318)" d="M8 14 1.6 7.8A3.9 3.9 0 0 1 8 2.9a3.9 3.9 0 0 1 6.4 4.9z" fill="#ff4d6d" stroke="#c9184a" stroke-width="1"/>`, x)
+		}
+		fmt.Fprintf(&h, `<rect x="22" y="342" width="52" height="20" rx="5" fill="#0b2533"/><text x="31" y="356.5" style="font-size:12px;font-weight:700;fill:#FDDD00">LV %d</text>`, level)
+		// XP bar under the chips
+		const bx, by, bw = 292.0, 162.0, 300.0
+		fmt.Fprintf(&h, `<text x="%g" y="%g" style="font-size:11px;font-weight:700;fill:#0b2533">XP</text>`, bx, by+9)
+		fmt.Fprintf(&h, `<rect x="%g" y="%g" width="%g" height="10" rx="5" fill="#0b2533" fill-opacity=".1"/>`, bx+22, by, bw)
+		fmt.Fprintf(&h, `<rect x="%g" y="%g" width="0" height="10" rx="5" fill="url(#xpg)"><animate attributeName="width" values="0;%.1f;%.1f" keyTimes="0;.25;1" dur="9s" repeatCount="indefinite" calcMode="spline" keySplines=".2 .8 .2 1;0 0 1 1"/></rect>`, bx+22, by, bw*frac, bw*frac)
+		fmt.Fprintf(&h, `<text x="%g" y="%g" style="font-size:11px;fill:#55707d">%d / %d to LV %d</text>`, bx+bw+32, by+9, xp%perLevel, perLevel, level+1)
+		if questSlot >= 0 {
+			n := float64(len(lines))
+			t0 := float64(questSlot) / n
+			t1 := t0 + 0.6/n
+			kt := fmt.Sprintf("0;%.4f;%.4f;%.4f;%.4f;1", t0, t0+0.02/n, t0+0.5/n, t1)
+			fmt.Fprintf(&h, `<g opacity="0"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="%s" dur="%gs" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0 12;0 12;0 0;0 -6;0 -10;0 -10" keyTimes="%s" dur="%gs" repeatCount="indefinite"/>`, kt, cycle, kt, cycle)
+			h.WriteString(`<rect x="62" y="6" width="176" height="28" rx="8" fill="#0b2533"/><text x="74" y="25" style="font-size:12.5px;font-weight:700;fill:#FDDD00">QUEST CLEARED +500 XP</text></g>`)
+			// coin burst
+			for i := 0; i < 6; i++ {
+				dx := -60 + float64(i)*24
+				fmt.Fprintf(&h, `<g opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;%.4f;%.4f;%.4f;1" dur="%gs" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0 0;0 0;%.0f -110;%.0f -70" keyTimes="0;%.4f;%.4f;1" dur="%gs" repeatCount="indefinite"/><circle cx="150" cy="200" r="6" fill="#FDDD00" stroke="#b8860b" stroke-width="1.5"/></g>`,
+					t0+0.04/n, t0+0.1/n, t0+0.4/n, cycle, dx*1.4, dx*1.8, t0, t0+0.35/n, cycle)
+			}
+			questJump = fmt.Sprintf(`<animateTransform attributeName="transform" type="translate" additive="sum" values="0 0;0 0;0 -18;0 0;0 0" keyTimes="0;%.4f;%.4f;%.4f;1" dur="%gs" repeatCount="indefinite"/>`, t0, t0+0.08/n, t0+0.16/n, cycle)
+		}
+		hud = h.String()
+	}
+
 	// character: bob, skirt, blink
-	fmt.Fprintf(&b, `<g transform="translate(%d %d)"><g><animateTransform attributeName="transform" type="translate" values="0 0;0 -5;0 0" dur="3.2s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><g transform="scale(%g)">`, charX, charY, charScale)
+	fmt.Fprintf(&b, `<g transform="translate(%d %d)"><g><animateTransform attributeName="transform" type="translate" values="0 0;0 -5;0 0" dur="3.2s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><g>%s<g transform="scale(%g)">`, charX, charY, questJump, charScale)
+	fmt.Fprintf(&b, `<g transform="translate(206 150)"><g><animateTransform attributeName="transform" type="skewX" values="-2.4;2.2;-2.4" dur="2.8s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><g transform="translate(-206 -150)"><image width="426" height="800" xlink:href="%s"/></g></g></g>`, dataURI("assets/hair.png"))
 	fmt.Fprintf(&b, `<image width="426" height="800" xlink:href="%s"/>`, dataURI("assets/char.png"))
 	b.WriteString(skirt())
-	fmt.Fprintf(&b, `<image x="150" y="90" width="100" height="50" opacity="0" xlink:href="%s"><animate attributeName="opacity" values="0;0;1;1;0;0;1;1;0" keyTimes="0;.62;.625;.65;.655;.9;.905;.93;.935" dur="5s" repeatCount="indefinite"/></image>`, dataURI("assets/blink.png"))
-	b.WriteString(`</g></g></g>`)
+	fmt.Fprintf(&b, `<image x="150" y="90" width="100" height="50" opacity="0" xlink:href="%s"><animate attributeName="opacity" values="0;0;1;1;0;0;1;1;0" keyTimes="0;.6;.605;.64;.645;.88;.885;.92;.925" dur="4.2s" repeatCount="indefinite"/></image>`, dataURI("assets/blink.png"))
+	b.WriteString(`</g></g></g></g>`)
+	b.WriteString(hud)
 
 	// title + chips
 	b.WriteString(fmt.Sprintf(`<text x="290" y="76" class="name">%s</text>`, esc(cfg.Name)))

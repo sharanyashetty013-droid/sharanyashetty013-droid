@@ -8,12 +8,32 @@
     "Latest quest cleared: {last_merged} merged!",
     "Now battling: {in_review}, in review.",
     "I write smart contracts in Solidity too.",
-    "Wins: HackXpo runner-up, Nexus Srinathon."
+    "Wins: HackXpo 2nd place, Nexus Srinathon 3rd!"
   ],
-  "exclude_repos": ["neilmalvalli-cyber/Provenrely"],
+  "exclude_repos": [
+    "neilmalvalli-cyber/Provenrely"
+  ],
   "fallback_prs": [
-    { "repo": "golang/go", "number": 82997, "status": "in review", "url": "https://github.com/golang/go/pull/82997", "title": "encoding/json/v2: fix stack overflow" },
-    { "repo": "rajputomsingh/Relay", "number": 124, "status": "merged", "url": "https://github.com/rajputomsingh/Relay/pull/124", "title": "service-level GET /v1/health endpoint" },
-    { "repo": "yalongwastaken/git-koi", "number": 69, "status": "merged", "url": "https://github.com/yalongwastaken/git-koi/pull/69", "title": "action: support Windows runners" }
+    {
+      "repo": "golang/go",
+      "number": 82997,
+      "status": "in review",
+      "url": "https://github.com/golang/go/pull/82997",
+      "title": "encoding/json/v2: fix stack overflow"
+    },
+    {
+      "repo": "rajputomsingh/Relay",
+      "number": 124,
+      "status": "merged",
+      "url": "https://github.com/rajputomsingh/Relay/pull/124",
+      "title": "service-level GET /v1/health endpoint"
+    },
+    {
+      "repo": "yalongwastaken/git-koi",
+      "number": 69,
+      "status": "merged",
+      "url": "https://github.com/yalongwastaken/git-koi/pull/69",
+      "title": "action: support Windows runners"
+    }
   ]
 }

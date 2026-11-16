@@ -40,7 +40,7 @@ All my projects in one place.
 ## 🏆 Hackathon wins
 
 - 🥈 **HackXpo S-05** · runner-up
-- 🏅 **Nexus Srinathon 2026 (SIT)** · consolation prize, top 30 of 250+
+- 🥉 **Nexus Srinathon 2026 (SIT)** · 3rd place out of 250+ teams
 - 🥈 **MLH Hacktoberfest** · runner-up, open source
 
 ## 💬 Ask me about
