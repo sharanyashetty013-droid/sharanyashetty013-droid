@@ -13,7 +13,7 @@ const FPS = 12, data = JSON.parse(readFileSync(join(root, "assets/stats-data.jso
 const chrome = process.env.CHROME_PATH || ["/usr/bin/google-chrome", "/usr/bin/google-chrome-stable", "/usr/bin/chromium"].find(existsSync);
 const browser = await puppeteer.launch({ executablePath: chrome, args: ["--no-sandbox", "--allow-file-access-from-files"] });
 const page = await browser.newPage();
-await page.setViewport({ width: 880, height: 620 });
+await page.setViewport({ width: 1320, height: 540 });
 await page.evaluateOnNewDocument(d => { window.DATA = d; }, data);
 await page.goto(pathToFileURL(join(here, "stats.html")).href);
 await page.evaluate(() => window.ready);

@@ -4,10 +4,10 @@
 @font-face{font-family:"Pixel";src:url("../assets/fonts/pixel.woff2") format("woff2")}
 html,body{margin:0;background:#000}canvas{display:block}
 </style></head>
-<body><canvas id="c" width="880" height="620"></canvas>
+<body><canvas id="c" width="1320" height="540"></canvas>
 <script>
 // Island Records: stats carved on standing stone tablets under the moon. Pure draw(t) -> seamless loop.
-const W = 880, H = 620, LOOP = 6, GROUND = 566;
+const W = 1320, H = 540, LOOP = 6, GROUND = 492;
 const D = Object.assign({contributions: 471, streak: 16, best: 17, lc: {easy: 40, medium: 18, hard: 3}, wins: 3, level: 6}, window.DATA || {});
 const ctx = document.getElementById("c").getContext("2d");
 const G = {};
@@ -59,21 +59,25 @@ function carve(text, cx, y, size = 14, c = "#e3dcab") { ctx.font = `${size}px "P
 function draw(t) {
   t = ((t % LOOP) + LOOP) % LOOP;
   ctx.imageSmoothingEnabled = false;
-  const sc = W / 736;
-  // sky + moon from the top of your picture, grass band from its lower part
-  ctx.drawImage(G.bg, 0, 0, 736, GROUND / sc, 0, 0, W, GROUND);
-  ctx.drawImage(G.bg, 0, 1050, 736, (H - GROUND) / sc, 0, GROUND, W, H - GROUND);
+  // sky + moon (top of the picture) and grass band, mirrored sideways into a wide strip
+  // one copy of the picture in the middle; the sides reuse its moon-free right edge, mirrored
+  const pano = (sy, sh, dy) => {
+    ctx.drawImage(G.bg, 0, sy, 736, sh, 292, dy, 736, sh);
+    for (const x of [0, 1028]) { ctx.save(); ctx.translate(x + 146, 0); ctx.scale(-1, 1); ctx.translate(-(x + 146), 0); ctx.drawImage(G.bg, 444, sy, 292, sh, x, dy, 292, sh); ctx.restore(); }
+  };
+  pano(0, GROUND, 0);
+  pano(1050, H - GROUND, GROUND);
   px(0, GROUND, W, 3, "#b4dc5a");
   // twinkles
-  for (let i = 0; i < 26; i++) { const tw = Math.sin(t / LOOP * TAU * (1 + i % 3) + i * 1.9); if (tw > 0.6) { const x = rnd(i) * W, y = rnd(i + 40) * 240; px(x, y, 3, 3, "#fff"); if (tw > 0.9) { px(x - 3, y + 1, 9, 1, "#cfe0ff"); px(x + 1, y - 3, 1, 9, "#cfe0ff"); } } }
+  for (let i = 0; i < 36; i++) { const tw = Math.sin(t / LOOP * TAU * (1 + i % 3) + i * 1.9); if (tw > 0.6) { const x = rnd(i) * W, y = rnd(i + 40) * 200; px(x, y, 3, 3, "#fff"); if (tw > 0.9) { px(x - 3, y + 1, 9, 1, "#cfe0ff"); px(x + 1, y - 3, 1, 9, "#cfe0ff"); } } }
 
   // title plaque
   ctx.font = '22px "Pixel"'; ctx.textAlign = "left"; ctx.lineJoin = "miter"; ctx.lineWidth = 8; ctx.strokeStyle = "#0b1020";
   ctx.strokeText("ISLAND RECORDS", 30, 50); ctx.fillStyle = "#fff"; ctx.fillText("ISLAND RECORDS", 30, 50);
-  px(748, 20, 104, 44, "#0b1020"); px(752, 24, 96, 36, "#1a2a4a"); glow("LV " + D.level, 800, 52, 18, t, 0);
+  px(1188, 20, 104, 44, "#0b1020"); px(1192, 24, 96, 36, "#1a2a4a"); glow("LV " + D.level, 1240, 52, 18, t, 0);
 
   // four standing stones
-  const SW = 196, SH = 300, gap = 16, x0 = (W - 4 * SW - 3 * gap) / 2, top = GROUND - SH;
+  const SW = 262, SH = 276, gap = 30, x0 = (W - 4 * SW - 3 * gap) / 2, top = GROUND - SH;
   const stones = [0, 1, 2, 3].map(i => [x0 + i * (SW + gap), top + [10, 0, 14, 4][i]]);
   stones.forEach(([x, y], i) => stone(x, y, SW, SH - [10, 0, 14, 4][i], i + 1));
   const cxs = stones.map(([x]) => x + SW / 2);
