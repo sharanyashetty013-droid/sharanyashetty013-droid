@@ -26,17 +26,6 @@ Tamper-proof, on-chain timestamped evidence certificates for flagged scam wallet
 **🌐 [Portfolio](https://portfolioo-cyan-three.vercel.app/)**<br/>
 All my projects in one place.
 
-## 🌱 Open source
-<sub>auto-synced from GitHub every 6 hours</sub>
-
-<!--OSS:START-->
-- 🟢 **[yalongwastaken/git-koi#69](https://github.com/yalongwastaken/git-koi/pull/69)** · action: support Windows runners
-- 🟡 **[golang/go#82997](https://github.com/golang/go/pull/82997)** · encoding/json/v2: detect cycles in self-referential pointer types
-- 🟢 **[rajputomsingh/Relay#124](https://github.com/rajputomsingh/Relay/pull/124)** · feat(health): add GET /v1/health service health endpoint
-
-<sub>🟢 merged · 🟡 in review</sub>
-<!--OSS:END-->
-
 ## 🏆 Hackathon wins
 
 - 🥈 **HackXpo S-05** · runner-up

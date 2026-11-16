@@ -375,7 +375,7 @@ func updateReadme(path string, prs []PR) error {
 	s := string(raw)
 	i, j := strings.Index(s, start), strings.Index(s, end)
 	if i < 0 || j < i {
-		return fmt.Errorf("markers %s / %s not found in %s", start, end, path)
+		return nil // no open-source section in the README: nothing to update
 	}
 	var b strings.Builder
 	b.WriteString(start + "\n")
