@@ -28,7 +28,7 @@
 
 <img src="./assets/cards/h-stats.svg" width="100%" alt="Stats"/>
 
-<img src="./assets/stats-eed3ee77.gif" width="100%" alt="Player stats: contributions, streak, wins, LeetCode"/>
+<img src="./assets/stats-3955ad00.gif" width="100%" alt="Player stats: contributions, streak, wins, LeetCode"/>
 
 <img src="./assets/cards/h-find.svg" width="100%" alt="Find me"/>
 
