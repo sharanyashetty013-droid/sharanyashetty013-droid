@@ -14,6 +14,7 @@ import (
 	"html"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -47,6 +48,8 @@ type Config struct {
 	Lines    []string `json:"lines"`
 	Clues    []Clue   `json:"clues"`
 	Fallback Stats    `json:"fallback"`
+	Exclude  []string `json:"exclude_repos"`
+	OSS      []PR     `json:"fallback_merged"`
 }
 
 var client = &http.Client{Timeout: 20 * time.Second}
@@ -79,7 +82,8 @@ func contributions(user string) (total, streak, longest int, err error) {
 		Data struct {
 			User struct {
 				CC struct {
-					Cal struct {
+					Restricted int `json:"restrictedContributionsCount"`
+					Cal        struct {
 						Total int `json:"totalContributions"`
 						Weeks []struct {
 							Days []struct {
@@ -91,7 +95,7 @@ func contributions(user string) (total, streak, longest int, err error) {
 			} `json:"user"`
 		} `json:"data"`
 	}
-	q := `query($u:String!){user(login:$u){contributionsCollection{contributionCalendar{totalContributions weeks{contributionDays{contributionCount}}}}}}`
+	q := `query($u:String!){user(login:$u){contributionsCollection{restrictedContributionsCount contributionCalendar{totalContributions weeks{contributionDays{contributionCount}}}}}}`
 	if err := postJSON("https://api.github.com/graphql", map[string]any{"query": q, "variables": map[string]string{"u": user}},
 		map[string]string{"Authorization": "Bearer " + tok}, &out); err != nil {
 		return 0, 0, 0, err
@@ -122,7 +126,7 @@ func contributions(user string) (total, streak, longest int, err error) {
 	for ; i >= 0 && days[i] > 0; i-- {
 		streak++
 	}
-	return out.Data.User.CC.Cal.Total, streak, longest, nil
+	return out.Data.User.CC.Cal.Total + out.Data.User.CC.Restricted, streak, longest, nil
 }
 
 func leetcode(user string) (LC, error) {
@@ -263,8 +267,82 @@ func main() {
 		s.LeetCode = lc
 	}
 
+	prs, err := mergedPRs(cfg.User, cfg.Exclude)
+	if err != nil || len(prs) == 0 {
+		log.Printf("merged PRs: using fallback (%v)", err)
+		prs = cfg.OSS
+	}
+	if err := updateOSS(prs); err != nil {
+		log.Fatal(err)
+	}
 	if err := os.WriteFile("assets/stats.svg", []byte(statsSVG(cfg, s)), 0o644); err != nil {
 		log.Fatal(err)
 	}
 	log.Printf("ok: %d contributions, %d-day streak, %d leetcode solved", s.Contributions, s.Streak, s.LeetCode.Easy+s.LeetCode.Medium+s.LeetCode.Hard)
+}
+
+// ---------- merged open-source PRs ----------
+
+type PR struct{ Repo, URL, Title string }
+
+func mergedPRs(user string, exclude []string) ([]PR, error) {
+	q := fmt.Sprintf("type:pr is:merged author:%s -user:%s", user, user)
+	req, _ := http.NewRequest("GET", "https://api.github.com/search/issues?sort=updated&order=desc&per_page=30&q="+url.QueryEscape(q), nil)
+	req.Header.Set("Accept", "application/vnd.github+json")
+	if t := os.Getenv("GITHUB_TOKEN"); t != "" {
+		req.Header.Set("Authorization", "Bearer "+t)
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		return nil, fmt.Errorf("github search: %s", res.Status)
+	}
+	var out struct {
+		Items []struct {
+			Title         string `json:"title"`
+			Number        int    `json:"number"`
+			HTMLURL       string `json:"html_url"`
+			RepositoryURL string `json:"repository_url"`
+		} `json:"items"`
+	}
+	if err := json.NewDecoder(res.Body).Decode(&out); err != nil {
+		return nil, err
+	}
+	skip := map[string]bool{}
+	for _, r := range exclude {
+		skip[strings.ToLower(r)] = true
+	}
+	var prs []PR
+	for _, it := range out.Items {
+		repo := strings.TrimPrefix(it.RepositoryURL, "https://api.github.com/repos/")
+		if skip[strings.ToLower(repo)] {
+			continue
+		}
+		prs = append(prs, PR{fmt.Sprintf("%s#%d", repo, it.Number), it.HTMLURL, it.Title})
+	}
+	return prs, nil
+}
+
+// updateOSS rewrites the block between the OSS markers in README.md (merged PRs only).
+func updateOSS(prs []PR) error {
+	raw, err := os.ReadFile("README.md")
+	if err != nil {
+		return err
+	}
+	const start, end = "<!--OSS:START-->", "<!--OSS:END-->"
+	s := string(raw)
+	i, j := strings.Index(s, start), strings.Index(s, end)
+	if i < 0 || j < i {
+		return nil
+	}
+	var b strings.Builder
+	b.WriteString(start + "\n")
+	for _, p := range prs {
+		fmt.Fprintf(&b, "- 🟢 **[%s](%s)** · %s\n", p.Repo, p.URL, p.Title)
+	}
+	b.WriteString(end)
+	return os.WriteFile("README.md", []byte(s[:i]+b.String()+s[j+len(end):]), 0o644)
 }
