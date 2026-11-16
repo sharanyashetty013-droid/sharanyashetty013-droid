@@ -33,6 +33,11 @@ type Stats struct {
 	LeetCode      LC  `json:"leetcode"`
 }
 
+type Clue struct {
+	Title string `json:"title"`
+	Sub   string `json:"sub"`
+}
+
 type Config struct {
 	User     string   `json:"user"`
 	LeetCode string   `json:"leetcode"`
@@ -41,6 +46,7 @@ type Config struct {
 	Wins     int      `json:"wins"`
 	Projects int      `json:"projects"`
 	Lines    []string `json:"lines"`
+	Clues    []Clue   `json:"clues"`
 	Fallback Stats    `json:"fallback"`
 }
 
@@ -263,7 +269,7 @@ func main() {
 	for _, l := range cfg.Lines {
 		lines = append(lines, r.Replace(l))
 	}
-	game := map[string]any{"name": cfg.Name, "tagline": cfg.Tagline, "level": level(s, cfg), "lines": lines}
+	game := map[string]any{"name": cfg.Name, "tagline": cfg.Tagline, "level": level(s, cfg), "lines": lines, "clues": cfg.Clues}
 	gj, _ := json.MarshalIndent(game, "", "  ")
 	if err := os.WriteFile("assets/game-data.json", append(gj, '\n'), 0o644); err != nil {
 		log.Fatal(err)
