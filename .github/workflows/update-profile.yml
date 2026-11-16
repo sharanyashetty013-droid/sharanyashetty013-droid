@@ -31,7 +31,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: render game GIF (only when its text/numbers or code changed)
         run: |
-          if git diff --quiet HEAD -- assets/game-data.json && [ -f assets/banner.gif ] && [ "${{ github.event_name }}" = "schedule" ]; then
+          if git diff --quiet HEAD -- assets/game-data.json && ls assets/banner-*.gif >/dev/null 2>&1 && [ "${{ github.event_name }}" = "schedule" ]; then
             echo "game data unchanged, keeping existing GIF"; exit 0
           fi
           command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
@@ -41,6 +41,6 @@ jobs:
         run: |
           git config user.name  "sharanya-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/banner.gif assets/stats.svg assets/game-data.json
+          git add -A assets README.md
           git diff --cached --quiet || git commit -m "chore: refresh profile [skip ci]"
           git push

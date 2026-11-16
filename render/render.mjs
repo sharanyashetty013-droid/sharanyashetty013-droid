@@ -1,7 +1,8 @@
 // Renders game.html frame by frame with headless Chrome and stitches a looping GIF.
 // Usage (from repo root): node render/render.mjs
 import puppeteer from "puppeteer-core";
-import { readFileSync, mkdtempSync, rmSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync, rmSync, existsSync, readdirSync, renameSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join, dirname, resolve } from "node:path";
@@ -38,4 +39,12 @@ execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-framerate", String(FPS), "
   "-vf", "split[a][b];[a]palettegen=max_colors=192:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=4:diff_mode=rectangle",
   "-loop", "0", out]);
 rmSync(dir, { recursive: true, force: true });
-console.log(`wrote ${out} (${n} frames)`);
+
+// unique name per render so GitHub's image cache can never show an old banner
+const hash = createHash("sha1").update(readFileSync(out)).digest("hex").slice(0, 8);
+const name = `banner-${hash}.gif`;
+for (const f of readdirSync(join(root, "assets"))) if (/^banner-[0-9a-f]{8}\.gif$/.test(f) && f !== name) rmSync(join(root, "assets", f));
+renameSync(out, join(root, "assets", name));
+const readme = join(root, "README.md");
+writeFileSync(readme, readFileSync(readme, "utf8").replace(/\.\/assets\/banner(-[0-9a-f]{8})?\.gif/g, `./assets/${name}`));
+console.log(`wrote assets/${name} (${n} frames)`);
