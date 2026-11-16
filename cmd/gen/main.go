@@ -1,53 +1,49 @@
-// Command gen builds the animated "live HTTP server" SVG for the GitHub
-// profile and refreshes the open-source section of README.md.
+// Command gen builds the animated profile banner (assets/banner.svg) and
+// refreshes the open-source section of README.md.
 //
 // Run from the repo root:  go run ./cmd/gen
 // Set GITHUB_TOKEN to avoid API rate limits (the Action does this for you).
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"html"
 	"log"
+	"math"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
-	"regexp"
 	"strings"
 	"time"
 )
 
 // ---------- config ----------
 
-type Endpoint struct {
-	Path string      `json:"path"`
-	MS   int         `json:"ms"`
-	Body [][2]string `json:"body"`
-}
-
 type PR struct {
 	Repo   string `json:"repo"`
 	Number int    `json:"number"`
-	Status string `json:"status"` // merged | in review | closed
+	Status string `json:"status"` // merged | in review
 	URL    string `json:"url"`
 	Title  string `json:"title"`
 }
 
 type Config struct {
-	User        string     `json:"user"`
-	Port        int        `json:"port"`
-	Uptime      string     `json:"uptime"`
-	Endpoints   []Endpoint `json:"endpoints"`
-	FallbackPRs []PR       `json:"fallback_prs"`
-	Exclude     []string   `json:"exclude_repos"`
+	User        string   `json:"user"`
+	Name        string   `json:"name"`
+	Tagline     string   `json:"tagline"`
+	Wins        int      `json:"wins"`
+	Lines       []string `json:"lines"`
+	Exclude     []string `json:"exclude_repos"`
+	FallbackPRs []PR     `json:"fallback_prs"`
 }
 
 // ---------- GitHub API ----------
 
 type searchResp struct {
-	TotalCount int `json:"total_count"`
-	Items      []struct {
+	Items []struct {
 		Title         string `json:"title"`
 		Number        int    `json:"number"`
 		HTMLURL       string `json:"html_url"`
@@ -59,16 +55,14 @@ type searchResp struct {
 	} `json:"items"`
 }
 
-func search(q string, perPage int) (*searchResp, error) {
-	u := "https://api.github.com/search/issues?sort=updated&order=desc&per_page=" +
-		fmt.Sprint(perPage) + "&q=" + url.QueryEscape(q)
-	req, _ := http.NewRequest("GET", u, nil)
+func fetchPRs(user string, exclude []string) ([]PR, error) {
+	q := fmt.Sprintf("type:pr author:%s -user:%s", user, user)
+	req, _ := http.NewRequest("GET", "https://api.github.com/search/issues?sort=updated&order=desc&per_page=50&q="+url.QueryEscape(q), nil)
 	req.Header.Set("Accept", "application/vnd.github+json")
 	if t := os.Getenv("GITHUB_TOKEN"); t != "" {
 		req.Header.Set("Authorization", "Bearer "+t)
 	}
-	c := &http.Client{Timeout: 15 * time.Second}
-	res, err := c.Do(req)
+	res, err := (&http.Client{Timeout: 15 * time.Second}).Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -77,195 +71,28 @@ func search(q string, perPage int) (*searchResp, error) {
 		return nil, fmt.Errorf("github: %s", res.Status)
 	}
 	var out searchResp
-	return &out, json.NewDecoder(res.Body).Decode(&out)
-}
-
-// fetchPRs returns PRs to other people's repos, newest first, plus totals.
-func fetchPRs(user string, exclude []string) (prs []PR, total, merged int, err error) {
-	all, err := search(fmt.Sprintf("type:pr author:%s -user:%s", user, user), 50)
-	if err != nil {
-		return nil, 0, 0, err
+	if err := json.NewDecoder(res.Body).Decode(&out); err != nil {
+		return nil, err
 	}
 	skip := map[string]bool{}
 	for _, r := range exclude {
 		skip[strings.ToLower(r)] = true
 	}
-	for _, it := range all.Items {
+	var prs []PR
+	for _, it := range out.Items {
 		status := "in review"
-		switch {
-		case it.PullRequest.MergedAt != nil:
+		if it.PullRequest.MergedAt != nil {
 			status = "merged"
-		case it.State == "closed":
-			continue // closed without merge: don't show
+		} else if it.State == "closed" {
+			continue
 		}
 		repo := strings.TrimPrefix(it.RepositoryURL, "https://api.github.com/repos/")
 		if skip[strings.ToLower(repo)] {
 			continue
 		}
 		prs = append(prs, PR{repo, it.Number, status, it.HTMLURL, it.Title})
-		if status == "merged" {
-			merged++
-		}
 	}
-	return prs, len(prs), merged, nil
-}
-
-// ---------- pixel character ----------
-// One char = one pixel. '.' is transparent.
-var palette = map[byte]string{
-	'H': "#2b2422", // hair
-	'h': "#4d3f3a", // hair shine
-	'P': "#2b2422", // ponytail (own layer, it sways)
-	'r': "#FDDD00", // hair tie
-	'S': "#c58c64", // skin
-	'E': "#1b1b1b", // eyes
-	'C': "#e08f78", // blush
-	'M': "#8a3f32", // mouth
-	'T': "#00ADD8", // crop top
-	't': "#5DC9E2", // crop top highlight
-	'k': "#0e2e48", // skirt waistband
-	'K': "#1f4e79", // skirt
-	'B': "#e6edf3", // shoes
-}
-
-var body = []string{
-	"....HHHHHH......",
-	"...HhhHHHHH.....",
-	"..HHHHHHHHHHr...",
-	"..HHSSSSSSHH....",
-	"..HSSSSSSSSH....",
-	"..HSSESSESSH....",
-	"..HSCSSSSCSH....",
-	"..HSSSMMSSSH....",
-	"....SSSSSS......",
-	"......SS........",
-	"..TTTTTTTTTT....",
-	"..TtTTTTTTTT....",
-	"...TTTTTTTT.....",
-	"....SSSSSS......",
-	"....kkkkkk......",
-	"...KKKKKKKK.....",
-	"..KKKKKKKKKK....",
-	"..KKKKKKKKKK....",
-	"....SS..SS......",
-	"....SS..SS......",
-	"....SS..SS......",
-	"...BBB..BBB.....",
-}
-
-var ponytail = []string{
-	"................",
-	"................",
-	".............P..",
-	".............PP.",
-	".............PP.",
-	"..............PP",
-	"...............P",
-	"...............P",
-}
-
-// arms in three poses
-var armsIdle = []string{
-	"", "", "", "", "", "", "", "", "", "", "", "",
-	"..S........S....",
-	"..S........S....",
-	"..S........S....",
-	"..S........S....",
-}
-var armsCatch = []string{
-	"", "", "", "", "", "",
-	".S..........S...",
-	".S..........S...",
-	".S..........S...",
-	".S..........S...",
-}
-var armsThrow = []string{
-	"", "", "", "", "", "", "", "", "", "", "",
-	"............SSS.",
-	"..S.............",
-	"..S.............",
-	"..S.............",
-	"..S.............",
-}
-
-const px = 7 // size of one pixel
-
-func pixels(grid []string, ox, oy int) string {
-	var b strings.Builder
-	for y, row := range grid {
-		for x := 0; x < len(row); {
-			c := row[x]
-			if c == '.' {
-				x++
-				continue
-			}
-			run := 1
-			for x+run < len(row) && row[x+run] == c {
-				run++
-			}
-			fmt.Fprintf(&b, `<rect x="%d" y="%d" width="%d" height="%d" fill="%s"/>`,
-				ox+x*px, oy+y*px, run*px, px, palette[c])
-			x += run
-		}
-	}
-	return b.String()
-}
-
-// ---------- JSON-ish rendering ----------
-
-var keyRe = regexp.MustCompile(`^(\s*)"([^"]+)": (.*?)(,?)$`)
-
-func esc(s string) string { return html.EscapeString(s) }
-
-func renderLine(line string, x, y int) string {
-	m := keyRe.FindStringSubmatch(line)
-	if m == nil {
-		return fmt.Sprintf(`<text x="%d" y="%d" class="p">%s</text>`, x, y, esc(line))
-	}
-	ind, key, val, comma := m[1], m[2], m[3], m[4]
-	vcls := "s"
-	switch {
-	case strings.HasPrefix(val, "["):
-		vcls = "a"
-	case strings.Contains(val, "merged"):
-		vcls = "ok"
-	case strings.Contains(val, "review"):
-		vcls = "y"
-	}
-	return fmt.Sprintf(`<text x="%d" y="%d" xml:space="preserve"><tspan class="p">%s"</tspan><tspan class="k">%s</tspan><tspan class="p">": </tspan><tspan class="%s">%s</tspan><tspan class="p">%s</tspan></text>`,
-		x, y, ind, esc(key), vcls, esc(val), comma)
-}
-
-func bodyLines(ep Endpoint, prs []PR, lastMerged string) []string {
-	var kv [][2]string
-	for _, p := range ep.Body {
-		switch {
-		case p[0] == "$prs":
-			for i, pr := range prs {
-				if i == 4 {
-					break
-				}
-				kv = append(kv, [2]string{fmt.Sprintf("%s#%d", shortRepo(pr.Repo), pr.Number), pr.Status})
-			}
-		case p[1] == "$last_merged":
-			kv = append(kv, [2]string{p[0], lastMerged})
-		default:
-			kv = append(kv, p)
-		}
-	}
-	lines := []string{"{"}
-	for i, p := range kv {
-		comma := ","
-		if i == len(kv)-1 {
-			comma = ""
-		}
-		v := p[1]
-		if !strings.HasPrefix(v, "[") {
-			v = `"` + v + `"`
-		}
-		lines = append(lines, fmt.Sprintf(`  "%s": %s%s`, p[0], v, comma))
-	}
-	return append(lines, "}")
+	return prs, nil
 }
 
 // "rajputomsingh/Relay" -> "Relay", but keep "golang/go" recognisable.
@@ -282,115 +109,201 @@ func shortRepo(r string) string {
 // ---------- SVG ----------
 
 const (
-	W, H   = 860, 340
-	slot   = 3.0 // seconds per request
-	charX  = 300
-	charY  = 78
-	panelX = 488
+	W, H = 860, 380
+	// character source image is 426x800 (cropped at the knees);
+	// it is drawn at this scale in the banner
+	charScale = 0.425
+	charX     = 58
+	charY     = 24
+	slot      = 4.5 // seconds each dialogue line stays up
+	fontPx    = 16
+	charW     = fontPx * 0.6 // monospace advance
 )
 
-func buildSVG(cfg Config, prs []PR, total, merged int, lastMerged string) string {
-	n := len(cfg.Endpoints)
-	cycle := slot * float64(n)
-	share := 100.0 / float64(n)                                            // percent of the full cycle one slot takes
-	at := func(f float64) string { return fmt.Sprintf("%.2f%%", f*share) } // f = fraction of a slot
+func esc(s string) string { return html.EscapeString(s) }
+
+func dataURI(path string) string {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return "data:image/png;base64," + base64.StdEncoding.EncodeToString(b)
+}
+
+// skirt draws a pleated skirt in the character's source-pixel coordinates.
+func skirt() string {
+	const (
+		topY           = 452.0
+		topL, topR     = 123.0, 290.0
+		hemL, hemR     = 104.0, 309.0
+		hemY, hemCurve = 624.0, 12.0
+		n              = 10
+	)
+	top := func(i int) (float64, float64) { return topL + float64(i)*(topR-topL)/n, topY }
+	hem := func(i int) (float64, float64) {
+		t := float64(i) / n
+		return hemL + t*(hemR-hemL), hemY + hemCurve*math.Sin(math.Pi*t)
+	}
+	var b strings.Builder
+	b.WriteString(`<defs>
+<linearGradient id="pl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b5b8c"/><stop offset="1" stop-color="#11446c"/></linearGradient>
+<linearGradient id="pd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0f3554"/><stop offset="1" stop-color="#0a2740"/></linearGradient>
+<linearGradient id="sh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset=".25" stop-color="#000" stop-opacity="0"/></linearGradient>
+</defs>`)
+	// pivot the sway around the waist
+	fmt.Fprintf(&b, `<g transform="translate(206 %g)"><g><animateTransform attributeName="transform" type="skewX" values="-1.6;1.6;-1.6" dur="3.2s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><g transform="translate(-206 -%g)">`, topY, topY)
+	var outline strings.Builder
+	for i := 0; i < n; i++ {
+		x0, y0 := top(i)
+		x1, y1 := top(i + 1)
+		x2, y2 := hem(i + 1)
+		x3, y3 := hem(i)
+		fill := "url(#pl)"
+		if i%2 == 1 {
+			fill = "url(#pd)"
+		}
+		fmt.Fprintf(&b, `<path d="M%.1f %.1fL%.1f %.1fL%.1f %.1fL%.1f %.1fZ" fill="%s"/>`, x0, y0, x1, y1, x2, y2, x3, y3, fill)
+		if i > 0 {
+			fmt.Fprintf(&b, `<line x1="%.1f" y1="%.1f" x2="%.1f" y2="%.1f" stroke="#5DC9E2" stroke-opacity=".28" stroke-width="1"/>`, x0, y0, x3, y3)
+		}
+	}
+	// shadow under the waistband
+	fmt.Fprintf(&b, `<path d="M%g %gL%g %gL%g %gL%g %gZ" fill="url(#sh)"/>`, topL, topY, topR, topY, hemR, hemY, hemL, hemY)
+	// hem trim
+	outline.WriteString("M")
+	for i := 0; i <= n*2; i++ {
+		t := float64(i) / float64(n*2)
+		x := hemL + t*(hemR-hemL)
+		y := hemY + hemCurve*math.Sin(math.Pi*t)
+		fmt.Fprintf(&outline, "%.1f %.1f ", x, y)
+	}
+	fmt.Fprintf(&b, `<path d="%s" fill="none" stroke="#00ADD8" stroke-width="4" stroke-linecap="round"/>`, strings.TrimSpace(outline.String()))
+	b.WriteString(`</g></g></g>`)
+	// waistband (does not sway)
+	fmt.Fprintf(&b, `<path d="M%g %gQ206 %g %g %gL%g %gQ206 %g %g %gZ" fill="#0a2238"/>`,
+		topL-1, topY-11, topY-15, topR+1, topY-11, topR+1, topY+1, topY-3, topL-1, topY+1)
+	fmt.Fprintf(&b, `<path d="M%g %gQ206 %g %g %g" fill="none" stroke="#00ADD8" stroke-opacity=".7" stroke-width="1.5"/>`, topL, topY-10, topY-14, topR, topY-10)
+	b.WriteString(`<rect x="199" y="439" width="14" height="11" rx="2" fill="#FDDD00"/><rect x="203" y="442" width="6" height="5" fill="#0a2238"/>`)
+	return b.String()
+}
+
+// typing returns a text line revealed character by character during its slot.
+func typing(id int, text string, x, y float64, total int, cycle float64) string {
+	n := len([]rune(text))
+	start := float64(id) / float64(total)
+	end := float64(id+1) / float64(total)
+	typeDur := math.Min(2.0, float64(n)*0.045) / cycle // fraction of cycle spent typing
+	var kt, vals []string
+	add := func(t, v float64) {
+		kt = append(kt, fmt.Sprintf("%.4f", t))
+		vals = append(vals, fmt.Sprintf("%.1f", v))
+	}
+	add(0, 0)
+	if start > 0 {
+		add(start, 0)
+	}
+	for c := 1; c <= n; c++ {
+		add(start+typeDur*float64(c)/float64(n), float64(c)*charW+0.5)
+	}
+	if end < 1 {
+		add(end, 0)
+	}
+	kt = append(kt, "1")
+	vals = append(vals, vals[len(vals)-1])
+	return fmt.Sprintf(`<clipPath id="c%d"><rect x="%g" y="%g" width="0" height="%d"><animate attributeName="width" dur="%gs" repeatCount="indefinite" calcMode="discrete" keyTimes="%s" values="%s"/></rect></clipPath><text x="%g" y="%g" class="dlg" clip-path="url(#c%d)">%s</text>`,
+		id, x, y-fontPx, fontPx+8, cycle, strings.Join(kt, ";"), strings.Join(vals, ";"), x, y, id, esc(text))
+}
+
+func buildSVG(cfg Config, prs []PR) string {
+	merged, review := 0, 0
+	lastMerged, inReview := "", ""
+	for _, p := range prs {
+		ref := fmt.Sprintf("%s#%d", shortRepo(p.Repo), p.Number)
+		if p.Status == "merged" {
+			merged++
+			if lastMerged == "" {
+				lastMerged = ref
+			}
+		} else {
+			review++
+			if inReview == "" {
+				inReview = ref
+			}
+		}
+	}
+	var lines []string
+	for _, l := range cfg.Lines {
+		if (strings.Contains(l, "{last_merged}") && lastMerged == "") || (strings.Contains(l, "{in_review}") && inReview == "") {
+			continue
+		}
+		l = strings.NewReplacer("{last_merged}", lastMerged, "{in_review}", inReview).Replace(l)
+		lines = append(lines, l)
+	}
+	cycle := slot * float64(len(lines))
 
 	var b strings.Builder
-	fmt.Fprintf(&b, `<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d" role="img" aria-label="Sharanya's live HTTP server: a pixel character catching requests and throwing back responses">`, W, H, W, H)
-
-	// ----- styles -----
+	fmt.Fprintf(&b, `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="%d" height="%d" viewBox="0 0 %d %d" role="img" aria-label="%s: %s">`, W, H, W, H, esc(cfg.Name), esc(cfg.Tagline))
 	b.WriteString(`<style>
-text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-size:12px;fill:#e6edf3}
-.k{fill:#00ADD8}.s{fill:#9be9ff}.p{fill:#6e7681}.a{fill:#FDDD00}.ok{fill:#3fb950}.y{fill:#FDDD00}
-.dim{fill:#6e7681}.blue{fill:#00ADD8}.t{font-size:12.5px}
-.live{animation:blink 1.2s steps(2) infinite}@keyframes blink{50%{opacity:.15}}
-.cur{animation:blink 1s steps(2) infinite}
-`)
-	// character poses (3s loop, aligned to each slot)
-	fmt.Fprintf(&b, `.idle{animation:idle %[1]gs infinite}.catch{opacity:0;animation:catch %[1]gs infinite}.throw{opacity:0;animation:throw %[1]gs infinite}
-@keyframes idle{0%%,27%%{opacity:1}28%%,62%%{opacity:0}63%%,100%%{opacity:1}}
-@keyframes catch{0%%,27%%{opacity:0}28%%,47%%{opacity:1}48%%,100%%{opacity:0}}
-@keyframes throw{0%%,47%%{opacity:0}48%%,62%%{opacity:1}63%%,100%%{opacity:0}}
-.hop{animation:hop %[1]gs infinite}@keyframes hop{0%%,27%%{transform:translateY(0)}33%%{transform:translateY(-8px)}40%%,100%%{transform:translateY(0)}}
-.tail{transform-box:fill-box;transform-origin:0 0;animation:sway 1.5s ease-in-out infinite alternate}@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(9deg)}}
-.resp{opacity:0;animation:resp %[1]gs infinite}
-@keyframes resp{0%%,49%%{opacity:0;transform:translate(0,0)}50%%{opacity:1;transform:translate(0,0)}62%%{transform:translate(48px,-46px)}74%%{opacity:1;transform:translate(96px,0)}75%%,100%%{opacity:0;transform:translate(96px,0)}}
-.boot{animation:boot %[2]gs forwards}@keyframes boot{0%%,99%%{opacity:1}100%%{opacity:0}}
-`, slot, slot*0.75)
-	// per-request + per-panel animations (full cycle, staggered)
-	fmt.Fprintf(&b, `.req{opacity:0;animation:req %gs infinite}
-@keyframes req{0%%{opacity:1;transform:translateX(0)}%s{opacity:1;transform:translateX(160px)}%s,100%%{opacity:0;transform:translateX(160px)}}
-.pan{opacity:0;animation:pan %gs infinite}
-@keyframes pan{0%%,%s{opacity:0}%s,%s{opacity:1}%s,100%%{opacity:0}}
-`, cycle, at(0.28), at(0.29), cycle, at(0.74), at(0.75), at(1.74), at(1.75))
-	for i := range cfg.Endpoints {
-		fmt.Fprintf(&b, ".d%d{animation-delay:%gs}\n", i, float64(i)*slot)
-	}
-	b.WriteString(`</style>`)
+text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;fill:#e6edf3}
+.name{font-family:"Segoe UI",Inter,"Helvetica Neue",Arial,sans-serif;font-weight:800;font-size:38px;letter-spacing:-.5px}
+.tag{font-size:14px;fill:#00ADD8}
+.chip{font-size:12.5px}
+.dlg{font-size:16px}
+.dim{fill:#6e7681;font-size:11px}
+.arrow{animation:bob .9s ease-in-out infinite alternate}@keyframes bob{to{transform:translateY(4px)}}
+.p{animation:rise linear infinite}@keyframes rise{0%{transform:translateY(0);opacity:0}15%{opacity:.9}100%{transform:translateY(-90px);opacity:0}}
+</style>`)
+	// background
+	fmt.Fprintf(&b, `<defs><radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#00ADD8" stop-opacity=".38"/><stop offset=".6" stop-color="#00ADD8" stop-opacity=".07"/><stop offset="1" stop-color="#00ADD8" stop-opacity="0"/></radialGradient>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1a26"/><stop offset="1" stop-color="#0d1117"/></linearGradient></defs>`)
+	fmt.Fprintf(&b, `<rect width="%d" height="%d" rx="16" fill="url(#bg)"/>`, W, H)
+	fmt.Fprintf(&b, `<rect x=".5" y=".5" width="%d" height="%d" rx="16" fill="none" stroke="#00ADD8" stroke-opacity=".35"/>`, W-1, H-1)
+	b.WriteString(`<circle cx="150" cy="190" r="180" fill="url(#glow)"><animate attributeName="r" values="170;188;170" dur="4s" repeatCount="indefinite"/></circle>`)
 
-	// ----- frame -----
-	fmt.Fprintf(&b, `<rect width="%d" height="%d" rx="12" fill="#0d1117"/>`, W, H)
-	fmt.Fprintf(&b, `<rect x=".5" y=".5" width="%d" height="%d" rx="12" fill="none" stroke="#00ADD8" stroke-opacity=".35"/>`, W-1, H-1)
-	// dotted backdrop
-	b.WriteString(`<defs><pattern id="g" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="2" height="2" fill="#00ADD8" opacity=".09"/></pattern></defs>`)
-	fmt.Fprintf(&b, `<rect x="1" y="34" width="%d" height="%d" fill="url(#g)"/>`, W-2, H-68)
-
-	// title bar
-	b.WriteString(`<circle cx="20" cy="17" r="5" fill="#ff5f56"/><circle cx="37" cy="17" r="5" fill="#ffbd2e"/><circle cx="54" cy="17" r="5" fill="#27c93f"/>`)
-	fmt.Fprintf(&b, `<text x="76" y="21" class="t"><tspan class="dim">~/</tspan>sharanya.go <tspan class="dim">— listening on</tspan> <tspan class="blue">:%d</tspan></text>`, cfg.Port)
-	fmt.Fprintf(&b, `<g class="live"><circle cx="%d" cy="17" r="4.5" fill="#3fb950"/></g><text x="%d" y="21" class="t" fill="#3fb950" style="fill:#3fb950">LIVE</text>`, W-60, W-50)
-	fmt.Fprintf(&b, `<line x1="1" y1="34" x2="%d" y2="34" stroke="#00ADD8" stroke-opacity=".25"/>`, W-1)
-
-	// client side label
-	b.WriteString(`<text x="22" y="62" class="dim">// incoming</text>`)
-
-	// requests
-	for i, ep := range cfg.Endpoints {
-		label := "GET " + ep.Path
-		w := len(label)*7 + 22
-		fmt.Fprintf(&b, `<g class="req d%d"><rect x="%d" y="118" width="%d" height="24" rx="4" fill="#0b2a36" stroke="#00ADD8"/><text x="%d" y="134"><tspan class="y">GET</tspan> %s</text></g>`,
-			i, 285-160-w, w, 285-160-w+11, esc(ep.Path))
-	}
-
-	// floor
-	floorY := charY + len(body)*px
-	for x := 16; x < panelX-12; x += 14 {
-		fmt.Fprintf(&b, `<rect x="%d" y="%d" width="12" height="6" fill="#00ADD8" opacity=".22"/>`, x, floorY+2)
-	}
-
-	// character
-	fmt.Fprintf(&b, `<g class="hop">`)
-	// name plate
-	fmt.Fprintf(&b, `<text x="%d" y="%d" class="dim" style="font-size:11px">▼ sharanya</text>`, charX+12, charY-14)
-	fmt.Fprintf(&b, `<g class="tail">%s</g>`, pixels(ponytail, charX, charY))
-	b.WriteString(pixels(body, charX, charY))
-	fmt.Fprintf(&b, `<g class="idle">%s</g>`, pixels(armsIdle, charX, charY))
-	fmt.Fprintf(&b, `<g class="catch">%s</g>`, pixels(armsCatch, charX, charY))
-	fmt.Fprintf(&b, `<g class="throw">%s</g>`, pixels(armsThrow, charX, charY))
-	b.WriteString(`</g>`)
-
-	// thrown response
-	fmt.Fprintf(&b, `<g class="resp"><rect x="%d" y="148" width="62" height="22" rx="4" fill="#0f2a17" stroke="#3fb950"/><text x="%d" y="163" style="fill:#3fb950">200 OK</text></g>`, charX+16*px-20, charX+16*px-12)
-
-	// response panel
-	pw := W - panelX - 18
-	fmt.Fprintf(&b, `<rect x="%d" y="50" width="%d" height="%d" rx="8" fill="#0a1520" stroke="#00ADD8" stroke-opacity=".4"/>`, panelX, pw, H-50-46)
-	fmt.Fprintf(&b, `<text x="%d" y="70" class="dim">// response</text>`, panelX+14)
-	fmt.Fprintf(&b, `<g class="boot"><text x="%d" y="100" class="dim">waiting for requests<tspan class="cur">_</tspan></text></g>`, panelX+14)
-	for i, ep := range cfg.Endpoints {
-		fmt.Fprintf(&b, `<g class="pan d%d">`, i)
-		fmt.Fprintf(&b, `<text x="%d" y="96"><tspan class="dim">→</tspan> <tspan class="y">GET</tspan> %s <tspan class="dim">HTTP/1.1</tspan></text>`, panelX+14, esc(ep.Path))
-		fmt.Fprintf(&b, `<text x="%d" y="114"><tspan class="dim">←</tspan> <tspan class="ok">200 OK</tspan> <tspan class="dim">· %dms · application/json</tspan></text>`, panelX+14, ep.MS)
-		for j, l := range bodyLines(ep, prs, lastMerged) {
-			b.WriteString(renderLine(l, panelX+14, 140+j*18))
+	// floating particles
+	rng := rand.New(rand.NewSource(7))
+	for i := 0; i < 22; i++ {
+		x := 20 + rng.Float64()*260
+		if i%3 == 0 {
+			x = 300 + rng.Float64()*540
 		}
-		b.WriteString(`</g>`)
+		y := 140 + rng.Float64()*230
+		r := 1 + rng.Float64()*1.8
+		dur := 4 + rng.Float64()*5
+		fmt.Fprintf(&b, `<circle class="p" cx="%.0f" cy="%.0f" r="%.1f" fill="#5DC9E2" style="animation-duration:%.1fs;animation-delay:-%.1fs"/>`, x, y, r, dur, rng.Float64()*dur)
 	}
 
-	// status bar
-	fmt.Fprintf(&b, `<line x1="1" y1="%d" x2="%d" y2="%d" stroke="#00ADD8" stroke-opacity=".25"/>`, H-34, W-1, H-34)
-	fmt.Fprintf(&b, `<text x="20" y="%d" class="t"><tspan class="dim">uptime</tspan> %s  <tspan class="dim">·  PRs shipped</tspan> <tspan class="blue">%d</tspan>  <tspan class="dim">·  merged</tspan> <tspan class="ok">%d</tspan>  <tspan class="dim">·  last sync</tspan> %s</text>`,
-		H-13, esc(cfg.Uptime), total, merged, time.Now().UTC().Format("02 Jan 2006 15:04 UTC"))
+	// character: bob, skirt, blink
+	fmt.Fprintf(&b, `<g transform="translate(%d %d)"><g><animateTransform attributeName="transform" type="translate" values="0 0;0 -5;0 0" dur="3.2s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><g transform="scale(%g)">`, charX, charY, charScale)
+	fmt.Fprintf(&b, `<image width="426" height="800" xlink:href="%s"/>`, dataURI("assets/char.png"))
+	b.WriteString(skirt())
+	fmt.Fprintf(&b, `<image x="150" y="90" width="100" height="50" opacity="0" xlink:href="%s"><animate attributeName="opacity" values="0;0;1;1;0;0;1;1;0" keyTimes="0;.62;.625;.65;.655;.9;.905;.93;.935" dur="5s" repeatCount="indefinite"/></image>`, dataURI("assets/blink.png"))
+	b.WriteString(`</g></g></g>`)
+
+	// title + chips
+	b.WriteString(fmt.Sprintf(`<text x="290" y="76" class="name">%s</text>`, esc(cfg.Name)))
+	b.WriteString(fmt.Sprintf(`<text x="292" y="104" class="tag">%s</text>`, esc(cfg.Tagline)))
+	chips := []struct{ label, color string }{
+		{fmt.Sprintf("● %d PRs merged", merged), "#3fb950"},
+		{fmt.Sprintf("◆ %d in review", review), "#FDDD00"},
+		{fmt.Sprintf("★ %d hackathon wins", cfg.Wins), "#00ADD8"},
+	}
+	cx := 292.0
+	for _, c := range chips {
+		w := float64(len([]rune(c.label)))*7.6 + 22
+		fmt.Fprintf(&b, `<rect x="%.0f" y="122" width="%.0f" height="26" rx="13" fill="%s" fill-opacity=".1" stroke="%s" stroke-opacity=".55"/><text x="%.0f" y="139.5" class="chip" style="fill:%s">%s</text>`, cx, w, c.color, c.color, cx+11, c.color, esc(c.label))
+		cx += w + 10
+	}
+
+	// dialogue box (visual-novel style)
+	b.WriteString(`<rect x="290" y="196" width="548" height="154" rx="12" fill="#08121b" fill-opacity=".92" stroke="#00ADD8" stroke-width="2"/>`)
+	b.WriteString(`<rect x="296" y="202" width="536" height="142" rx="8" fill="none" stroke="#00ADD8" stroke-opacity=".25"/>`)
+	b.WriteString(`<rect x="308" y="182" width="118" height="30" rx="6" fill="#00ADD8"/><text x="322" y="202" style="font-weight:700;font-size:14px;fill:#062030;letter-spacing:2px">SHARANYA</text>`)
+	for i, l := range lines {
+		b.WriteString(typing(i, l, 316, 258, len(lines), cycle))
+	}
+	fmt.Fprintf(&b, `<text x="316" y="332" class="dim">auto-synced from GitHub · %s</text>`, time.Now().UTC().Format("02 Jan 2006"))
+	b.WriteString(`<g class="arrow"><path d="M806 318l8 9 8-9z" fill="#00ADD8"/></g>`)
 
 	b.WriteString(`</svg>`)
 	return b.String()
@@ -434,32 +347,16 @@ func main() {
 	if err := json.Unmarshal(raw, &cfg); err != nil {
 		log.Fatal(err)
 	}
-
-	prs, total, merged, err := fetchPRs(cfg.User, cfg.Exclude)
+	prs, err := fetchPRs(cfg.User, cfg.Exclude)
 	if err != nil || len(prs) == 0 {
 		log.Printf("using fallback PRs (%v)", err)
 		prs = cfg.FallbackPRs
-		total, merged = len(prs), 0
-		for _, p := range prs {
-			if p.Status == "merged" {
-				merged++
-			}
-		}
 	}
-
-	lastMerged := "soon"
-	for _, p := range prs {
-		if p.Status == "merged" {
-			lastMerged = fmt.Sprintf("%s#%d", shortRepo(p.Repo), p.Number)
-			break
-		}
-	}
-
-	if err := os.WriteFile("assets/server.svg", []byte(buildSVG(cfg, prs, total, merged, lastMerged)), 0o644); err != nil {
+	if err := os.WriteFile("assets/banner.svg", []byte(buildSVG(cfg, prs)), 0o644); err != nil {
 		log.Fatal(err)
 	}
 	if err := updateReadme("README.md", prs); err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("ok: %d PRs (%d merged)", total, merged)
+	log.Printf("ok: %d PRs", len(prs))
 }

@@ -1,109 +1,19 @@
 {
   "user": "sharanyashetty013-droid",
-  "port": 8080,
-  "uptime": "4y of backend",
-  "endpoints": [
-    {
-      "path": "/whoami",
-      "ms": 2,
-      "body": [
-        [
-          "name",
-          "Sharanya L Shetty"
-        ],
-        [
-          "class",
-          "backend mage · lvl 2"
-        ],
-        [
-          "stack",
-          "[\"Go\", \"Solidity\", \"C++\"]"
-        ],
-        [
-          "campus",
-          "NMAMIT · CSE"
-        ],
-        [
-          "side_quest",
-          "writes poetry"
-        ]
-      ]
-    },
-    {
-      "path": "/open-source",
-      "ms": 4,
-      "body": [
-        [
-          "$prs",
-          ""
-        ]
-      ]
-    },
-    {
-      "path": "/hackathons",
-      "ms": 3,
-      "body": [
-        [
-          "HackXpo S-05",
-          "runner-up"
-        ],
-        [
-          "Nexus Srinathon",
-          "consolation · top 30"
-        ],
-        [
-          "Hacktoberfest",
-          "runner-up · OSS"
-        ]
-      ]
-    },
-    {
-      "path": "/now",
-      "ms": 1,
-      "body": [
-        [
-          "building",
-          "Relay#74 crash-recovery"
-        ],
-        [
-          "grinding",
-          "Striver A2Z · C++"
-        ],
-        [
-          "learning",
-          "Solidity + DeFi"
-        ],
-        [
-          "last_merge",
-          "$last_merged"
-        ]
-      ]
-    }
+  "name": "Sharanya L Shetty",
+  "tagline": "backend · blockchain · problem solver",
+  "wins": 3,
+  "lines": [
+    "Hi! I'm Sharanya. I build backends in Go.",
+    "Latest quest cleared: {last_merged} merged!",
+    "Now battling: {in_review}, in review.",
+    "I write smart contracts in Solidity too.",
+    "Wins: HackXpo runner-up, Nexus Srinathon."
   ],
+  "exclude_repos": ["neilmalvalli-cyber/Provenrely"],
   "fallback_prs": [
-    {
-      "repo": "golang/go",
-      "number": 82997,
-      "status": "in review",
-      "url": "https://github.com/golang/go/pull/82997",
-      "title": "encoding/json/v2: fix stack overflow"
-    },
-    {
-      "repo": "rajputomsingh/Relay",
-      "number": 124,
-      "status": "merged",
-      "url": "https://github.com/rajputomsingh/Relay/pull/124",
-      "title": "service-level GET /v1/health endpoint"
-    },
-    {
-      "repo": "yalongwastaken/git-koi",
-      "number": 69,
-      "status": "in review",
-      "url": "https://github.com/yalongwastaken/git-koi/pull/69",
-      "title": "action: support Windows runners"
-    }
-  ],
-  "exclude_repos": [
-    "neilmalvalli-cyber/Provenrely"
+    { "repo": "golang/go", "number": 82997, "status": "in review", "url": "https://github.com/golang/go/pull/82997", "title": "encoding/json/v2: fix stack overflow" },
+    { "repo": "rajputomsingh/Relay", "number": 124, "status": "merged", "url": "https://github.com/rajputomsingh/Relay/pull/124", "title": "service-level GET /v1/health endpoint" },
+    { "repo": "yalongwastaken/git-koi", "number": 69, "status": "merged", "url": "https://github.com/yalongwastaken/git-koi/pull/69", "title": "action: support Windows runners" }
   ]
 }
