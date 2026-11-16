@@ -40,6 +40,7 @@ type Config struct {
 	Uptime      string     `json:"uptime"`
 	Endpoints   []Endpoint `json:"endpoints"`
 	FallbackPRs []PR       `json:"fallback_prs"`
+	Exclude     []string   `json:"exclude_repos"`
 }
 
 // ---------- GitHub API ----------
@@ -80,14 +81,14 @@ func search(q string, perPage int) (*searchResp, error) {
 }
 
 // fetchPRs returns PRs to other people's repos, newest first, plus totals.
-func fetchPRs(user string) (prs []PR, total, merged int, err error) {
-	all, err := search(fmt.Sprintf("type:pr author:%s -user:%s", user, user), 20)
+func fetchPRs(user string, exclude []string) (prs []PR, total, merged int, err error) {
+	all, err := search(fmt.Sprintf("type:pr author:%s -user:%s", user, user), 50)
 	if err != nil {
 		return nil, 0, 0, err
 	}
-	m, err := search(fmt.Sprintf("type:pr is:merged author:%s -user:%s", user, user), 1)
-	if err != nil {
-		return nil, 0, 0, err
+	skip := map[string]bool{}
+	for _, r := range exclude {
+		skip[strings.ToLower(r)] = true
 	}
 	for _, it := range all.Items {
 		status := "in review"
@@ -98,9 +99,15 @@ func fetchPRs(user string) (prs []PR, total, merged int, err error) {
 			continue // closed without merge: don't show
 		}
 		repo := strings.TrimPrefix(it.RepositoryURL, "https://api.github.com/repos/")
+		if skip[strings.ToLower(repo)] {
+			continue
+		}
 		prs = append(prs, PR{repo, it.Number, status, it.HTMLURL, it.Title})
+		if status == "merged" {
+			merged++
+		}
 	}
-	return prs, all.TotalCount, m.TotalCount, nil
+	return prs, len(prs), merged, nil
 }
 
 // ---------- pixel character ----------
@@ -285,7 +292,7 @@ const (
 func buildSVG(cfg Config, prs []PR, total, merged int, lastMerged string) string {
 	n := len(cfg.Endpoints)
 	cycle := slot * float64(n)
-	share := 100.0 / float64(n) // percent of the full cycle one slot takes
+	share := 100.0 / float64(n)                                            // percent of the full cycle one slot takes
 	at := func(f float64) string { return fmt.Sprintf("%.2f%%", f*share) } // f = fraction of a slot
 
 	var b strings.Builder
@@ -404,18 +411,17 @@ func updateReadme(path string, prs []PR) error {
 	}
 	var b strings.Builder
 	b.WriteString(start + "\n")
-	b.WriteString("| request | repo | what | status |\n|---|---|---|---|\n")
 	for k, pr := range prs {
 		if k == 6 {
 			break
 		}
-		badge := "🟡 in review"
+		badge := "🟡"
 		if pr.Status == "merged" {
-			badge = "🟢 merged"
+			badge = "🟢"
 		}
-		fmt.Fprintf(&b, "| `POST /pulls` | [%s#%d](%s) | %s | %s |\n", pr.Repo, pr.Number, pr.URL, strings.ReplaceAll(pr.Title, "|", "\\|"), badge)
+		fmt.Fprintf(&b, "- %s **[%s#%d](%s)** · %s\n", badge, pr.Repo, pr.Number, pr.URL, pr.Title)
 	}
-	b.WriteString(end)
+	b.WriteString("\n<sub>🟢 merged · 🟡 in review</sub>\n" + end)
 	return os.WriteFile(path, []byte(s[:i]+b.String()+s[j+len(end):]), 0o644)
 }
 
@@ -429,7 +435,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	prs, total, merged, err := fetchPRs(cfg.User)
+	prs, total, merged, err := fetchPRs(cfg.User, cfg.Exclude)
 	if err != nil || len(prs) == 0 {
 		log.Printf("using fallback PRs (%v)", err)
 		prs = cfg.FallbackPRs

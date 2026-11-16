@@ -21,13 +21,11 @@ X-Focus: backend, blockchain, problem-solving
 <sub>auto-synced from GitHub every 6 hours ⟳</sub>
 
 <!--OSS:START-->
-| request | repo | what | status |
-|---|---|---|---|
-| `POST /pulls` | [yalongwastaken/git-koi#69](https://github.com/yalongwastaken/git-koi/pull/69) | action: support Windows runners | 🟢 merged |
-| `POST /pulls` | [golang/go#82997](https://github.com/golang/go/pull/82997) | encoding/json/v2: detect cycles in self-referential pointer types | 🟡 in review |
-| `POST /pulls` | [rajputomsingh/Relay#124](https://github.com/rajputomsingh/Relay/pull/124) | feat(health): add GET /v1/health service health endpoint | 🟢 merged |
-| `POST /pulls` | [neilmalvalli-cyber/Provenrely#3](https://github.com/neilmalvalli-cyber/Provenrely/pull/3) | feat: implement Provenrely backend engines (scan, certificates, copilot) | 🟢 merged |
-| `POST /pulls` | [neilmalvalli-cyber/Provenrely#1](https://github.com/neilmalvalli-cyber/Provenrely/pull/1) | style: format Solidity files with forge fmt | 🟢 merged |
+- 🟢 **[yalongwastaken/git-koi#69](https://github.com/yalongwastaken/git-koi/pull/69)** · action: support Windows runners
+- 🟡 **[golang/go#82997](https://github.com/golang/go/pull/82997)** · encoding/json/v2: detect cycles in self-referential pointer types
+- 🟢 **[rajputomsingh/Relay#124](https://github.com/rajputomsingh/Relay/pull/124)** · feat(health): add GET /v1/health service health endpoint
+
+<sub>🟢 merged · 🟡 in review</sub>
 <!--OSS:END-->
 
 ### `→ GET /hackathons`
@@ -37,7 +35,6 @@ X-Focus: backend, blockchain, problem-solving
 | HackXpo S-05 | 🥈 runner-up |
 | Nexus Srinathon 2026 (SIT) | 🏅 consolation prize · top 30 of 250+ |
 | MLH Hacktoberfest | 🥈 runner-up · open source |
-| RecHersion Hackathon · NITK | participant |
 
 ### `→ GET /stack`
 
