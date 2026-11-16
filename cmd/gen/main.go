@@ -1,6 +1,5 @@
 // Command gen pulls live stats (GitHub contributions + streak, LeetCode) and writes:
 //
-//	assets/game-data.json  – text and numbers for the animated game banner (render/)
 //	assets/stats.svg       – the "player stats" card
 //
 // Run from the repo root:  go run ./cmd/gen
@@ -264,16 +263,6 @@ func main() {
 		s.LeetCode = lc
 	}
 
-	r := strings.NewReplacer("{contribs}", fmt.Sprint(s.Contributions), "{streak}", fmt.Sprint(s.Streak))
-	lines := make([]string, 0, len(cfg.Lines))
-	for _, l := range cfg.Lines {
-		lines = append(lines, r.Replace(l))
-	}
-	game := map[string]any{"name": cfg.Name, "tagline": cfg.Tagline, "level": level(s, cfg), "lines": lines, "clues": cfg.Clues}
-	gj, _ := json.MarshalIndent(game, "", "  ")
-	if err := os.WriteFile("assets/game-data.json", append(gj, '\n'), 0o644); err != nil {
-		log.Fatal(err)
-	}
 	if err := os.WriteFile("assets/stats.svg", []byte(statsSVG(cfg, s)), 0o644); err != nil {
 		log.Fatal(err)
 	}

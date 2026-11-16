@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/banner-b771e7ee.gif" width="100%" alt="Sharanya L Shetty — mystery case file game banner"/>
+  <img src="./terminal-banner.svg" width="100%" alt="Sharanya Shetty - animated banner"/>
 </p>
 
 <p align="center">
