@@ -126,7 +126,9 @@ func contributions(user string) (total, streak, longest int, err error) {
 	for ; i >= 0 && days[i] > 0; i-- {
 		streak++
 	}
-	return out.Data.User.CC.Cal.Total + out.Data.User.CC.Restricted, streak, longest, nil
+	// with "include private contributions" on, the calendar total already counts them; don't add Restricted again
+	log.Printf("calendar total %d (restricted, already included: %d)", out.Data.User.CC.Cal.Total, out.Data.User.CC.Restricted)
+	return out.Data.User.CC.Cal.Total, streak, longest, nil
 }
 
 func leetcode(user string) (LC, error) {
