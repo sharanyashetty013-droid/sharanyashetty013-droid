@@ -30,7 +30,12 @@ WATER = np.array(
     ],
     dtype=np.uint8,
 )
-PIXEL = 1  # water pixel size, matching git-koi's export scale
+PIXEL = 1  # water pixel size, in the koi's native pixels
+
+# Wide pond. git-koi's released Action draws a 256x256 pond (exported at 2x);
+# the fish's square is centred in this wider pond so it spans the README.
+POND_WIDTH, POND_HEIGHT = 1024, 256
+FISH_SCALE = 2  # git-koi's export scale, undone so pond and fish share pixels
 
 
 def recolor(rgb):
@@ -74,10 +79,15 @@ def main(path):
     for i in range(frames):
         src.seek(i)
         durations.append(src.info.get("duration", 100))
-        rgba = np.array(src.convert("RGBA"))
-        height, width = rgba.shape[:2]
+        # git-koi exports at 2x; drop back to its native pixels.
+        rgba = np.array(src.convert("RGBA"))[::FISH_SCALE, ::FISH_SCALE]
+        fh, fw = rgba.shape[:2]
 
-        out = water(width, height, i, frames)
+        out = water(POND_WIDTH, POND_HEIGHT, i, frames)
+
+        # The fish's square sits in the middle of the wide pond.
+        top, left = (POND_HEIGHT - fh) // 2, (POND_WIDTH - fw) // 2
+        region = out[top : top + fh, left : left + fw]
 
         fish = rgba[..., 3] > 0
         colours, inverse = np.unique(rgba[fish][:, :3], axis=0, return_inverse=True)
@@ -85,7 +95,7 @@ def main(path):
             [cache.setdefault(tuple(c), recolor(c)) for c in colours.tolist()],
             dtype=np.uint8,
         )
-        out[fish] = mapped[inverse.reshape(-1)]
+        region[fish] = mapped[inverse.reshape(-1)]
         out_frames.append(Image.fromarray(out, "RGB"))
 
     out_frames[0].save(
