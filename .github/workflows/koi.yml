@@ -6,7 +6,7 @@ on:
     - cron: "20 0 * * *"
   workflow_dispatch:
   push:
-    paths: [.github/workflows/koi.yml]
+    paths: [.github/workflows/koi.yml, scripts/recolor_koi.py]
 
 permissions:
   contents: write
@@ -23,6 +23,13 @@ jobs:
           body: asagi
           scale: 2
           output-dir: koi
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Recolour the koi (neon violet on a dark pond)
+        run: |
+          pip install --quiet pillow numpy
+          python scripts/recolor_koi.py koi/koi.gif
       - name: Commit the koi if it changed
         shell: bash
         run: |
