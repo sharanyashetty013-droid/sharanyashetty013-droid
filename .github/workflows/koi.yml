@@ -20,9 +20,8 @@ jobs:
       - uses: actions/checkout@v7
       - uses: yalongwastaken/git-koi@v1
         with:
-          body: gold
-          size: 768x256
-          scale: 1
+          body: asagi
+          scale: 2
           output-dir: koi
       - name: Commit the koi if it changed
         shell: bash
