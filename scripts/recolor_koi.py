@@ -30,7 +30,7 @@ WATER = np.array(
     ],
     dtype=np.uint8,
 )
-PIXEL = 2  # water pixel size, matching git-koi's export scale
+PIXEL = 1  # water pixel size, matching git-koi's export scale
 
 
 def recolor(rgb):

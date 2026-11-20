@@ -21,7 +21,8 @@ jobs:
       - uses: yalongwastaken/git-koi@v1
         with:
           body: asagi
-          scale: 2
+          size: 1024x256
+          scale: 1
           output-dir: koi
       - uses: actions/setup-python@v5
         with:
