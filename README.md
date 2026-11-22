@@ -14,7 +14,7 @@
 
 <img src="./assets/cards/h-oss.svg" width="100%" alt="Open source"/>
 <!--OSS:START-->
-<a href="https://github.com/csinitte/nexus-2026/pull/6"><img src="./assets/cards/pr-0.svg" width="32%" alt="csinitte/nexus-2026#6 · feat: Phase 2 UI (mock data)"/></a>
+<a href="https://github.com/csinitte/nexus-2026/pull/6"><img src="./assets/cards/pr-0.svg" width="32%" alt="csinitte/nexus-2026#6 · feat: Jury system UI (mock data)"/></a>
 <a href="https://github.com/go-gitea/gitea/pull/40463"><img src="./assets/cards/pr-1.svg" width="32%" alt="go-gitea/gitea#40463 · refactor: split preReceiveBranch checks into smaller functions"/></a>
 <a href="https://github.com/rajputomsingh/Relay/pull/167"><img src="./assets/cards/pr-2.svg" width="32%" alt="rajputomsingh/Relay#167 · test(delivery): add worker crash recovery integration test"/></a>
 <a href="https://github.com/u-root/gobusybox/pull/187"><img src="./assets/cards/pr-3.svg" width="32%" alt="u-root/gobusybox#187 · golang, findpkg: fix godot, ST1017 and unconvert findings"/></a>
