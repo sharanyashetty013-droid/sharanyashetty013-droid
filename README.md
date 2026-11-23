@@ -14,7 +14,7 @@
 
 <img src="./assets/cards/h-oss.svg" width="100%" alt="Open source"/>
 <!--OSS:START-->
-<a href="https://github.com/golang/go/pull/83293"><img src="./assets/cards/pr-0.svg" width="32%" alt="golang/go#83293 · database/sql: document that Rows must be closed"/></a>
+<a href="https://github.com/rajputomsingh/Relay/pull/179"><img src="./assets/cards/pr-0.svg" width="32%" alt="rajputomsingh/Relay#179 · ci: automate SDK releases to npm and PyPI on SDK-specific tags"/></a>
 <a href="https://github.com/csinitte/nexus-2026/pull/6"><img src="./assets/cards/pr-1.svg" width="32%" alt="csinitte/nexus-2026#6 · feat: Jury system UI (mock data)"/></a>
 <a href="https://github.com/go-gitea/gitea/pull/40463"><img src="./assets/cards/pr-2.svg" width="32%" alt="go-gitea/gitea#40463 · refactor: split preReceiveBranch checks into smaller functions"/></a>
 <a href="https://github.com/rajputomsingh/Relay/pull/167"><img src="./assets/cards/pr-3.svg" width="32%" alt="rajputomsingh/Relay#167 · test(delivery): add worker crash recovery integration test"/></a>
@@ -29,7 +29,7 @@
 <img src="./assets/cards/wins.svg" width="100%" alt="HackXpo S-05 runner-up · Nexus Srinathon 2026 3rd place · MLH Hacktoberfest runner-up"/>
 
 <img src="./assets/cards/h-stats.svg" width="100%" alt="Stats"/>
-<img src="./assets/stats-6df2cbbd.gif" width="100%" alt="Island Records: contributions, streak, LeetCode, hackathon wins"/>
+<img src="./assets/stats-0b8618de.gif" width="100%" alt="Island Records: contributions, streak, LeetCode, hackathon wins"/>
 <img src="./koi/koi-21217171.gif" width="100%" alt="My koi, redrawn every night from my GitHub activity"/>
 
 <img src="./assets/cards/h-find.svg" width="100%" alt="Find me"/>
