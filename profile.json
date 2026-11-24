@@ -55,7 +55,7 @@
       "Repo": "golang/go#82997",
       "URL": "https://github.com/golang/go/pull/82997",
       "Title": "encoding/json/v2: detect cycles in self-referential pointer types",
-      "Status": "open"
+      "Status": "merged"
     },
     {
       "Repo": "go-gitea/gitea#40463",
@@ -230,5 +230,11 @@
     "golang/go",
     "go-gitea/gitea"
   ],
-  "oss_max": 6
+  "oss_max": 6,
+  "oss_gerrit_repos": [
+    "golang/go"
+  ],
+  "oss_status": {
+    "golang/go#82997": "merged"
+  }
 }

@@ -39,22 +39,24 @@ type Clue struct {
 }
 
 type Config struct {
-	User        string       `json:"user"`
-	LeetCode    string       `json:"leetcode"`
-	Name        string       `json:"name"`
-	Tagline     string       `json:"tagline"`
-	Wins        int          `json:"wins"`
-	Projects    int          `json:"projects"`
-	Lines       []string     `json:"lines"`
-	Clues       []Clue       `json:"clues"`
-	Fallback    Stats        `json:"fallback"`
-	Exclude     []string     `json:"exclude_repos"`
-	OSS         []PR         `json:"fallback_merged"`
-	OSSFeatured []string     `json:"oss_featured"` // repos always shown first, in this order
-	OSSMax      int          `json:"oss_max"`      // max repo cards (default 6)
-	ProjectList []Project    `json:"project_cards"`
-	Wins2       []Win        `json:"win_list"`
-	Stack       []StackGroup `json:"stack"`
+	User        string            `json:"user"`
+	LeetCode    string            `json:"leetcode"`
+	Name        string            `json:"name"`
+	Tagline     string            `json:"tagline"`
+	Wins        int               `json:"wins"`
+	Projects    int               `json:"projects"`
+	Lines       []string          `json:"lines"`
+	Clues       []Clue            `json:"clues"`
+	Fallback    Stats             `json:"fallback"`
+	Exclude     []string          `json:"exclude_repos"`
+	OSS         []PR              `json:"fallback_merged"`
+	OSSFeatured []string          `json:"oss_featured"`     // repos always shown first, in this order
+	OSSMax      int               `json:"oss_max"`          // max repo cards (default 6)
+	OSSGerrit   []string          `json:"oss_gerrit_repos"` // review on Gerrit: a closed GitHub PR there means merged
+	OSSStatus   map[string]string `json:"oss_status"`       // manual override, e.g. "golang/go#82997": "merged"
+	ProjectList []Project         `json:"project_cards"`
+	Wins2       []Win             `json:"win_list"`
+	Stack       []StackGroup      `json:"stack"`
 }
 
 var client = &http.Client{Timeout: 20 * time.Second}
@@ -295,10 +297,15 @@ func main() {
 		s.LeetCode = lc
 	}
 
-	prs, err := mergedPRs(cfg.User, cfg.Exclude)
+	prs, err := mergedPRs(cfg.User, cfg.Exclude, cfg.OSSGerrit)
 	if err != nil || len(prs) == 0 {
 		log.Printf("merged PRs: using fallback (%v)", err)
 		prs = cfg.OSS
+	}
+	for i := range prs {
+		if st, ok := cfg.OSSStatus[prs[i].Repo]; ok {
+			prs[i].Status = st
+		}
 	}
 	if err := updateOSS(writeCards(cfg, prs)); err != nil {
 		log.Fatal(err)
@@ -320,7 +327,7 @@ func main() {
 // Status is "merged" or "open". Empty (old fallback entries) counts as merged.
 type PR struct{ Repo, URL, Title, Status string }
 
-func mergedPRs(user string, exclude []string) ([]PR, error) {
+func mergedPRs(user string, exclude, gerrit []string) ([]PR, error) {
 	q := fmt.Sprintf("type:pr author:%s -user:%s", user, user)
 	req, _ := http.NewRequest("GET", "https://api.github.com/search/issues?sort=updated&order=desc&per_page=100&q="+url.QueryEscape(q), nil)
 	req.Header.Set("Accept", "application/vnd.github+json")
@@ -354,11 +361,19 @@ func mergedPRs(user string, exclude []string) ([]PR, error) {
 	for _, r := range exclude {
 		skip[strings.ToLower(r)] = true
 	}
+	isGerrit := map[string]bool{}
+	for _, r := range gerrit {
+		isGerrit[strings.ToLower(r)] = true
+	}
 	var prs []PR
 	for _, it := range out.Items {
 		repo := strings.TrimPrefix(it.RepositoryURL, "https://api.github.com/repos/")
-		if skip[strings.ToLower(repo)] || (it.State == "closed" && it.PullRequest.MergedAt == nil) {
-			continue // closed without merging: leave it out
+		if skip[strings.ToLower(repo)] {
+			continue
+		}
+		// closed without merging: leave it out, unless the repo merges on Gerrit (bot closes the PR)
+		if it.State == "closed" && it.PullRequest.MergedAt == nil && !isGerrit[strings.ToLower(repo)] {
+			continue
 		}
 		status := "merged"
 		if it.State == "open" {
