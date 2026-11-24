@@ -50,6 +50,8 @@ type Config struct {
 	Fallback    Stats        `json:"fallback"`
 	Exclude     []string     `json:"exclude_repos"`
 	OSS         []PR         `json:"fallback_merged"`
+	OSSFeatured []string     `json:"oss_featured"` // repos always shown first, in this order
+	OSSMax      int          `json:"oss_max"`      // max repo cards (default 6)
 	ProjectList []Project    `json:"project_cards"`
 	Wins2       []Win        `json:"win_list"`
 	Stack       []StackGroup `json:"stack"`
@@ -315,11 +317,12 @@ func main() {
 
 // ---------- merged open-source PRs ----------
 
-type PR struct{ Repo, URL, Title string }
+// Status is "merged" or "open". Empty (old fallback entries) counts as merged.
+type PR struct{ Repo, URL, Title, Status string }
 
 func mergedPRs(user string, exclude []string) ([]PR, error) {
 	q := fmt.Sprintf("type:pr author:%s -user:%s", user, user)
-	req, _ := http.NewRequest("GET", "https://api.github.com/search/issues?sort=updated&order=desc&per_page=30&q="+url.QueryEscape(q), nil)
+	req, _ := http.NewRequest("GET", "https://api.github.com/search/issues?sort=updated&order=desc&per_page=100&q="+url.QueryEscape(q), nil)
 	req.Header.Set("Accept", "application/vnd.github+json")
 	if t := os.Getenv("GITHUB_TOKEN"); t != "" {
 		req.Header.Set("Authorization", "Bearer "+t)
@@ -357,7 +360,11 @@ func mergedPRs(user string, exclude []string) ([]PR, error) {
 		if skip[strings.ToLower(repo)] || (it.State == "closed" && it.PullRequest.MergedAt == nil) {
 			continue // closed without merging: leave it out
 		}
-		prs = append(prs, PR{fmt.Sprintf("%s#%d", repo, it.Number), it.HTMLURL, it.Title})
+		status := "merged"
+		if it.State == "open" {
+			status = "open"
+		}
+		prs = append(prs, PR{fmt.Sprintf("%s#%d", repo, it.Number), it.HTMLURL, it.Title, status})
 	}
 	return prs, nil
 }

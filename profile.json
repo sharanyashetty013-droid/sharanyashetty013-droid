@@ -47,23 +47,51 @@
     }
   ],
   "exclude_repos": [
-    "neilmalvalli-cyber/Provenrely"
+    "neilmalvalli-cyber/Provenrely",
+    "csinitte/nexus-2026"
   ],
   "fallback_merged": [
     {
       "Repo": "golang/go#82997",
       "URL": "https://github.com/golang/go/pull/82997",
-      "Title": "encoding/json/v2: detect cycles in self-referential pointer types"
+      "Title": "encoding/json/v2: detect cycles in self-referential pointer types",
+      "Status": "open"
+    },
+    {
+      "Repo": "go-gitea/gitea#40463",
+      "URL": "https://github.com/go-gitea/gitea/pull/40463",
+      "Title": "refactor: split preReceiveBranch checks into smaller functions",
+      "Status": "merged"
+    },
+    {
+      "Repo": "rajputomsingh/Relay#179",
+      "URL": "https://github.com/rajputomsingh/Relay/pull/179",
+      "Title": "ci: automate SDK releases to npm and PyPI on SDK-specific tags",
+      "Status": "merged"
+    },
+    {
+      "Repo": "rajputomsingh/Relay#167",
+      "URL": "https://github.com/rajputomsingh/Relay/pull/167",
+      "Title": "test(delivery): add worker crash recovery integration test",
+      "Status": "merged"
     },
     {
       "Repo": "rajputomsingh/Relay#124",
       "URL": "https://github.com/rajputomsingh/Relay/pull/124",
-      "Title": "feat(health): add GET /v1/health service health endpoint"
+      "Title": "feat(health): add GET /v1/health service health endpoint",
+      "Status": "merged"
+    },
+    {
+      "Repo": "u-root/gobusybox#187",
+      "URL": "https://github.com/u-root/gobusybox/pull/187",
+      "Title": "golang, findpkg: fix godot, ST1017 and unconvert findings",
+      "Status": "merged"
     },
     {
       "Repo": "yalongwastaken/git-koi#69",
       "URL": "https://github.com/yalongwastaken/git-koi/pull/69",
-      "Title": "action: support Windows runners"
+      "Title": "action: support Windows runners",
+      "Status": "merged"
     }
   ],
   "win_list": [
@@ -197,5 +225,10 @@
         "Striver A2Z"
       ]
     }
-  ]
+  ],
+  "oss_featured": [
+    "golang/go",
+    "go-gitea/gitea"
+  ],
+  "oss_max": 6
 }
