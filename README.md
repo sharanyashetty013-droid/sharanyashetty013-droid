@@ -14,22 +14,19 @@
 
 <img src="./assets/cards/h-oss.svg" width="100%" alt="Open source"/>
 <!--OSS:START-->
-<a href="https://github.com/rajputomsingh/Relay/pull/179"><img src="./assets/cards/pr-0.svg" width="32%" alt="rajputomsingh/Relay#179 · ci: automate SDK releases to npm and PyPI on SDK-specific tags"/></a>
-<a href="https://github.com/csinitte/nexus-2026/pull/6"><img src="./assets/cards/pr-1.svg" width="32%" alt="csinitte/nexus-2026#6 · feat: Jury system UI (mock data)"/></a>
-<a href="https://github.com/go-gitea/gitea/pull/40463"><img src="./assets/cards/pr-2.svg" width="32%" alt="go-gitea/gitea#40463 · refactor: split preReceiveBranch checks into smaller functions"/></a>
-<a href="https://github.com/rajputomsingh/Relay/pull/167"><img src="./assets/cards/pr-3.svg" width="32%" alt="rajputomsingh/Relay#167 · test(delivery): add worker crash recovery integration test"/></a>
-<a href="https://github.com/u-root/gobusybox/pull/187"><img src="./assets/cards/pr-4.svg" width="32%" alt="u-root/gobusybox#187 · golang, findpkg: fix godot, ST1017 and unconvert findings"/></a>
-<a href="https://github.com/csinitte/nexus-2026/pull/3"><img src="./assets/cards/pr-5.svg" width="32%" alt="csinitte/nexus-2026#3 · Panel: sliding cards for panelists"/></a>
-<a href="https://github.com/yalongwastaken/git-koi/pull/69"><img src="./assets/cards/pr-6.svg" width="32%" alt="yalongwastaken/git-koi#69 · action: support Windows runners"/></a>
-<a href="https://github.com/golang/go/pull/82997"><img src="./assets/cards/pr-7.svg" width="32%" alt="golang/go#82997 · encoding/json/v2: detect cycles in self-referential pointer types"/></a>
-<a href="https://github.com/rajputomsingh/Relay/pull/124"><img src="./assets/cards/pr-8.svg" width="32%" alt="rajputomsingh/Relay#124 · feat(health): add GET /v1/health service health endpoint"/></a>
+<a href="https://github.com/golang/go/pull/82997"><img src="./assets/cards/pr-0.svg" width="32%" alt="golang/go · 1 PR(s) · encoding/json/v2: detect cycles in self-referential pointer types"/></a>
+<a href="https://github.com/go-gitea/gitea/pull/40463"><img src="./assets/cards/pr-1.svg" width="32%" alt="go-gitea/gitea · 1 PR(s) · refactor: split preReceiveBranch checks into smaller functions"/></a>
+<a href="https://github.com/rajputomsingh/Relay/pulls?q=is%3Apr+author%3Asharanyashetty013-droid"><img src="./assets/cards/pr-2.svg" width="32%" alt="rajputomsingh/Relay · 3 PR(s) · ci: automate SDK releases to npm and PyPI on SDK-specific tags"/></a>
+<a href="https://github.com/u-root/gobusybox/pull/187"><img src="./assets/cards/pr-3.svg" width="32%" alt="u-root/gobusybox · 1 PR(s) · golang, findpkg: fix godot, ST1017 and unconvert findings"/></a>
+<a href="https://github.com/yalongwastaken/git-koi/pull/69"><img src="./assets/cards/pr-4.svg" width="32%" alt="yalongwastaken/git-koi · 1 PR(s) · action: support Windows runners"/></a>
+<a href="https://github.com/search?q=is%3Apr+author%3Asharanyashetty013-droid+-user%3Asharanyashetty013-droid&type=pullrequests&s=updated"><img src="./assets/cards/pr-all.svg" width="100%" alt="See all my open-source contributions"/></a>
 <!--OSS:END-->
 
 <img src="./assets/cards/h-wins.svg" width="100%" alt="Hackathon wins"/>
 <img src="./assets/cards/wins.svg" width="100%" alt="HackXpo S-05 runner-up · Nexus Srinathon 2026 3rd place · MLH Hacktoberfest runner-up"/>
 
 <img src="./assets/cards/h-stats.svg" width="100%" alt="Stats"/>
-<img src="./assets/stats-0b8618de.gif" width="100%" alt="Island Records: contributions, streak, LeetCode, hackathon wins"/>
+<img src="./assets/stats-b6dbe85f.gif" width="100%" alt="Island Records: contributions, streak, LeetCode, hackathon wins"/>
 <img src="./koi/koi-21217171.gif" width="100%" alt="My koi, redrawn every night from my GitHub activity"/>
 
 <img src="./assets/cards/h-find.svg" width="100%" alt="Find me"/>
