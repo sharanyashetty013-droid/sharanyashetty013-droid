@@ -14,7 +14,7 @@
 
 <img src="./assets/cards/h-oss.svg" width="100%" alt="Open source"/>
 <!--OSS:START-->
-<a href="https://github.com/golang/go/pull/82997"><img src="./assets/cards/pr-0.svg" width="32%" alt="golang/go · 1 PR(s) · encoding/json/v2: detect cycles in self-referential pointer types"/></a>
+<a href="https://github.com/golang/go/pulls?q=is%3Apr+author%3Asharanyashetty013-droid"><img src="./assets/cards/pr-0.svg" width="32%" alt="golang/go · 2 PR(s) · database/sql: document that Rows must be closed"/></a>
 <a href="https://github.com/go-gitea/gitea/pull/40463"><img src="./assets/cards/pr-1.svg" width="32%" alt="go-gitea/gitea · 1 PR(s) · refactor: split preReceiveBranch checks into smaller functions"/></a>
 <a href="https://github.com/rajputomsingh/Relay/pulls?q=is%3Apr+author%3Asharanyashetty013-droid"><img src="./assets/cards/pr-2.svg" width="32%" alt="rajputomsingh/Relay · 3 PR(s) · ci: automate SDK releases to npm and PyPI on SDK-specific tags"/></a>
 <a href="https://github.com/u-root/gobusybox/pull/187"><img src="./assets/cards/pr-3.svg" width="32%" alt="u-root/gobusybox · 1 PR(s) · golang, findpkg: fix godot, ST1017 and unconvert findings"/></a>
