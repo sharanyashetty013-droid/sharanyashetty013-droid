@@ -28,7 +28,6 @@
 
 <img src="./assets/cards/h-stats.svg" width="100%" alt="Stats"/>
 <img src="./assets/stats-b76bcd6f.gif" width="100%" alt="Island Records: contributions, streak, LeetCode, hackathon wins"/>
-<img src="./koi/koi-dce25cc3.gif" width="100%" alt="My koi, redrawn every night from my GitHub activity"/>
 
 <img src="./assets/cards/h-find.svg" width="100%" alt="Find me"/>
 
