@@ -17,9 +17,9 @@
 <a href="https://github.com/golang/go/pulls?q=is%3Apr+author%3Asharanyashetty013-droid"><img src="./assets/cards/pr-0.svg" width="32%" alt="golang/go · 2 PR(s) · database/sql: document that Rows must be closed"/></a>
 <a href="https://github.com/go-gitea/gitea/pull/40463"><img src="./assets/cards/pr-1.svg" width="32%" alt="go-gitea/gitea · 1 PR(s) · refactor: split preReceiveBranch checks into smaller functions"/></a>
 <a href="https://github.com/rajputomsingh/Relay/pulls?q=is%3Apr+author%3Asharanyashetty013-droid"><img src="./assets/cards/pr-2.svg" width="32%" alt="rajputomsingh/Relay · 3 PR(s) · ci: automate SDK releases to npm and PyPI on SDK-specific tags"/></a>
-<a href="https://github.com/golang/build/pull/154"><img src="./assets/cards/pr-3.svg" width="32%" alt="golang/build · 1 PR(s) · cmd/watchflakes: file a new issue when a broken bot breaks again"/></a>
-<a href="https://github.com/u-root/gobusybox/pull/187"><img src="./assets/cards/pr-4.svg" width="32%" alt="u-root/gobusybox · 1 PR(s) · golang, findpkg: fix godot, ST1017 and unconvert findings"/></a>
-<a href="https://github.com/yalongwastaken/git-koi/pull/69"><img src="./assets/cards/pr-5.svg" width="32%" alt="yalongwastaken/git-koi · 1 PR(s) · action: support Windows runners"/></a>
+<a href="https://github.com/up-for-grabs/up-for-grabs.net/pull/6503"><img src="./assets/cards/pr-3.svg" width="32%" alt="up-for-grabs/up-for-grabs.net · 1 PR(s) · Add midsave"/></a>
+<a href="https://github.com/golang/build/pull/154"><img src="./assets/cards/pr-4.svg" width="32%" alt="golang/build · 1 PR(s) · cmd/watchflakes: file a new issue when a broken bot breaks again"/></a>
+<a href="https://github.com/u-root/gobusybox/pull/187"><img src="./assets/cards/pr-5.svg" width="32%" alt="u-root/gobusybox · 1 PR(s) · golang, findpkg: fix godot, ST1017 and unconvert findings"/></a>
 <a href="https://github.com/search?q=is%3Apr+author%3Asharanyashetty013-droid+-user%3Asharanyashetty013-droid&type=pullrequests&s=updated"><img src="./assets/cards/pr-all.svg" width="100%" alt="See all my open-source contributions"/></a>
 <!--OSS:END-->
 
@@ -27,7 +27,7 @@
 <img src="./assets/cards/wins.svg" width="100%" alt="HackXpo S-05 runner-up · Nexus Srinathon 2026 3rd place · MLH Hacktoberfest runner-up"/>
 
 <img src="./assets/cards/h-stats.svg" width="100%" alt="Stats"/>
-<img src="./assets/stats-4aafbb05.gif" width="100%" alt="Island Records: contributions, streak, LeetCode, hackathon wins"/>
+<img src="./assets/stats-53895028.gif" width="100%" alt="Island Records: contributions, streak, LeetCode, hackathon wins"/>
 
 <img src="./assets/cards/h-find.svg" width="100%" alt="Find me"/>
 
